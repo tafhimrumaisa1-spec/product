@@ -24,7 +24,8 @@ FluxMandate converts commercial agreements into reviewed obligations, determinis
 - Local Anchor registry for contract commitments and mandate state
 - Explicit Live AI and Verified Replay modes
 - Phantom browser connection on Solana Devnet
-- Synthetic in-limit settlement and over-limit rejection scenarios
+- Recorded Devnet settlement plus an on-chain `6017 CapExceeded` rejection
+- Deterministic in-browser replay of the same decision boundary
 
 Replay mode is intentionally labelled and remains available when an AI provider or Devnet is unavailable.
 
@@ -38,8 +39,9 @@ The FluxMandate authority registry is deployed and executable on Solana Devnet:
 The bounded-payment upgrade is deployed. Its source enforces the agent, source
 token account, vendor owner, mint, active window, fixed-period cap, delegated
 allowance and replay-protected payment receipt atomically. End-to-end token
-settlement is not represented as verified until the synthetic Devnet golden
-path has produced transaction evidence.
+settlement is verified by the synthetic Devnet golden path. Public transaction
+evidence is checked in under `packages/devnet-harness/evidence/` and linked from
+the proof screen.
 
 ## Local development
 

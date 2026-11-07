@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import type { ExtractionResult } from "@/lib/flux-contracts";
+import { DEVNET_EVIDENCE, devnetTransaction } from "@/lib/devnet-evidence";
 import { WalletConnect } from "./wallet-connect";
 import { simulateTwin } from "../../../../packages/twin/src/index";
 
@@ -149,7 +150,7 @@ export function FluxExperience() {
             <div className="core"><small>SAFE TO DEPLOY</small><strong>$18.4K</strong><span>verified capacity</span></div>
             <article className="floating-card card-contract"><small>CONTRACT</small><strong>Axiom Compute</strong><span>$12K · 3 months</span></article>
             <article className="floating-card card-agent"><small>AGENT 01</small><strong>$2.74K left</strong><span>mandate active</span></article>
-            <article className="floating-card card-proof"><small>REGISTRY</small><strong>Live on Devnet</strong><span>program executable</span></article>
+            <article className="floating-card card-proof"><small>LIVE PROOF</small><strong>Settle + reject</strong><span>verified on Devnet</span></article>
           </div>
           <div className="instrument-foot"><span><i className="signal" /> Registry verified</span><a className="mono" href="https://explorer.solana.com/address/E7MjFsDybvfCaoNWopicKzB4oAtHBWTVAC5ZX9ajWJRq?cluster=devnet" target="_blank" rel="noreferrer">E7Mj…WJRq ↗</a></div>
         </div>
@@ -321,6 +322,7 @@ function ProofStage({ state }: { state: "idle" | "settled" | "blocked" }) {
 
   const visibleTrace = proof?.trace.steps.map((step) => [humanize(step.kind), step.entries[0]?.summary || step.status]) || trace;
   return <div className="stage"><div className="stage-intro"><span className="stage-tag">FluxProof</span><h3>One trace. Every reason.</h3><p>This public trace comes from the deterministic ledger package. Synthetic fixture signatures intentionally have no Explorer links.</p></div>
+    <div className="evidence-note live-evidence"><b>Recorded Devnet golden path</b><span>One authorized settlement finalized; one over-cap attempt failed on-chain with 6017 CapExceeded.</span><small>Run {DEVNET_EVIDENCE.runId}</small><div><a href={devnetTransaction(DEVNET_EVIDENCE.authorized.signature)} target="_blank" rel="noreferrer">Authorized {DEVNET_EVIDENCE.authorized.amount} ↗</a><a href={devnetTransaction(DEVNET_EVIDENCE.rejected.signature)} target="_blank" rel="noreferrer">Rejected {DEVNET_EVIDENCE.rejected.amount} ↗</a></div></div>
     <div className="trace">{visibleTrace.map(([label, value], index) => <article key={`${label}-${index}`}><span>{String(index + 1).padStart(2, "0")}</span><div><small>{label}</small><strong>{value}</strong></div>{index < visibleTrace.length - 1 && <i />}</article>)}</div>
     <div className="proof-receipt"><div><small>DEMO OUTCOME</small><strong>{proofError ? "Proof service unavailable" : proof?.trace.headline || (state === "blocked" ? "Rejected before settlement" : "Building evidence trace…")}</strong><span>{proof?.notice}</span></div><span className={`status ${state === "blocked" || proofError ? "status-danger" : "status-good"}`}>{proof?.trace.complete ? "Trace complete" : state === "blocked" ? "Policy blocked" : "Replay evidence"}</span></div>
   </div>;

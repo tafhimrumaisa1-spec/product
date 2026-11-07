@@ -1,0 +1,75 @@
+{
+  "schema": "fluxmandate.devnet-golden-path.v1",
+  "runId": "9f606857-f1eb-4f1f-877b-df3f15eb6018",
+  "createdAt": "2026-11-07T17:53:56.614Z",
+  "cluster": "devnet",
+  "rpcUrl": "https://api.devnet.solana.com",
+  "programId": "E7MjFsDybvfCaoNWopicKzB4oAtHBWTVAC5ZX9ajWJRq",
+  "signer": "65UpuUWvd21qmRxLJKnbHKfkacRR38Nz9SA1QBFgvDpQ",
+  "vendor": "CMgP3ZC8JEn7iKJK7yPwtHxjSmtkymjv1XH4dK5PafnE",
+  "syntheticAsset": {
+    "mint": "6ndL9DEqQayYr1KDSHSVwZW93DyxsjWgA4gXijuaqch3",
+    "decimals": 6,
+    "treasuryTokenAccount": "FVEguk8g673aDpDvJ2yW4fJZN7nMuUsHCcqkJVFPTLfu",
+    "vendorTokenAccount": "2WXPbkeqsoSsd9xXGSc3SnjEqSW43o6vodLypANoFyB9"
+  },
+  "accounts": {
+    "companyRegistry": "8ioBRzGG6AKQfhTA3YvXgBCXzGgmy6rSPiuz31hd3rVY",
+    "mandateLink": "BcAmTR6svDVZ7eAbkEhTcoDH64CA2NEw217Zn2XsJm4F",
+    "paymentReceipt": "8grX7vqEwnWnRW1dP7p6vLiKasoKEXMnbfRAkmfcjzPX"
+  },
+  "transactions": {
+    "mint": {
+      "signature": "7qV9StFbZMkjx3K3vSevu8t7hHj9Y9Dh9VPjUEF1hES5eMjdGE62PB5JafrPQUAYuUeGv26UD2fcE5bvieW6Hru",
+      "explorerUrl": "https://explorer.solana.com/tx/7qV9StFbZMkjx3K3vSevu8t7hHj9Y9Dh9VPjUEF1hES5eMjdGE62PB5JafrPQUAYuUeGv26UD2fcE5bvieW6Hru?cluster=devnet"
+    },
+    "initializeCompany": {
+      "signature": "4g8XKU6Sg5jixqT3SSC3nL9qeSE9mDme2dutmWaDcaj3teG3WPKBkaGsD749t4BMBCd4VBXER8duJk3QS77z4wCg",
+      "explorerUrl": "https://explorer.solana.com/tx/4g8XKU6Sg5jixqT3SSC3nL9qeSE9mDme2dutmWaDcaj3teG3WPKBkaGsD749t4BMBCd4VBXER8duJk3QS77z4wCg?cluster=devnet"
+    },
+    "commitContract": {
+      "signature": "2rMkcU7BL3qTQCFsx4xxBJtoc9mHtW4WnrPcregGv2uTjbxBpsemUiyQaHFocKr8cbnML89ZBigCBruUWbEVBi8y",
+      "explorerUrl": "https://explorer.solana.com/tx/2rMkcU7BL3qTQCFsx4xxBJtoc9mHtW4WnrPcregGv2uTjbxBpsemUiyQaHFocKr8cbnML89ZBigCBruUWbEVBi8y?cluster=devnet"
+    },
+    "linkMandate": {
+      "signature": "4VXG6iBwF2cm1MDUBHkW5JhoPmJzYB5RmbDk4xi9NzGtDGNsxasYpiAkU99LibAsJJpF7oVR4s6ZeVuC1reBn8cF",
+      "explorerUrl": "https://explorer.solana.com/tx/4VXG6iBwF2cm1MDUBHkW5JhoPmJzYB5RmbDk4xi9NzGtDGNsxasYpiAkU99LibAsJJpF7oVR4s6ZeVuC1reBn8cF?cluster=devnet"
+    },
+    "approveDelegate": {
+      "signature": "4vMbX8PZRWxu8gYwD6Ry5ScA1V2kMLrN5VSDGmx9xCS39uhZfnDT8Pd5iCuyYooGJ83iUrvNPA4dNDPAKLtbVgZj",
+      "explorerUrl": "https://explorer.solana.com/tx/4vMbX8PZRWxu8gYwD6Ry5ScA1V2kMLrN5VSDGmx9xCS39uhZfnDT8Pd5iCuyYooGJ83iUrvNPA4dNDPAKLtbVgZj?cluster=devnet"
+    },
+    "activateMandate": {
+      "signature": "4rSkCS9RqWvAixkPfhEAKp2dKqkp2pfaScCfmXhdNTea3E9KjzbUw5wDMeAeXCtASoDtwDeXpHe9oFEwLDh6ifVe",
+      "explorerUrl": "https://explorer.solana.com/tx/4rSkCS9RqWvAixkPfhEAKp2dKqkp2pfaScCfmXhdNTea3E9KjzbUw5wDMeAeXCtASoDtwDeXpHe9oFEwLDh6ifVe?cluster=devnet"
+    },
+    "authorizedPayment": {
+      "signature": "eDFgXQ17fLKvgt8J33k5po3nVTXqYXGE1o6ajQmjF1RkZmZLhpRyiYS8e4aSDxYWTpyC15DPbhYUApMM8xoV9xQ",
+      "explorerUrl": "https://explorer.solana.com/tx/eDFgXQ17fLKvgt8J33k5po3nVTXqYXGE1o6ajQmjF1RkZmZLhpRyiYS8e4aSDxYWTpyC15DPbhYUApMM8xoV9xQ?cluster=devnet"
+    },
+    "overCapAttempt": {
+      "rejected": true,
+      "reason": "CapExceeded",
+      "signature": "3sognxbcxsbcZbUhnwNKmcAoWeB2YQB97LP5yuRrRdHLoMkQL1LR6Fqo9drFPUrnkFgKGkqBpTRBZfuRPW17TwSR",
+      "explorerUrl": "https://explorer.solana.com/tx/3sognxbcxsbcZbUhnwNKmcAoWeB2YQB97LP5yuRrRdHLoMkQL1LR6Fqo9drFPUrnkFgKGkqBpTRBZfuRPW17TwSR?cluster=devnet",
+      "logs": [
+        "Program E7MjFsDybvfCaoNWopicKzB4oAtHBWTVAC5ZX9ajWJRq invoke [1]",
+        "Program log: Instruction: ExecutePayment",
+        "Program 11111111111111111111111111111111 invoke [2]",
+        "Program 11111111111111111111111111111111 success",
+        "Program log: AnchorError thrown in programs/flux-mandate-registry/src/lib.rs:435. Error Code: CapExceeded. Error Number: 6017. Error Message: The payment exceeds the current period cap..",
+        "Program E7MjFsDybvfCaoNWopicKzB4oAtHBWTVAC5ZX9ajWJRq consumed 13957 of 200000 compute units",
+        "Program E7MjFsDybvfCaoNWopicKzB4oAtHBWTVAC5ZX9ajWJRq failed: custom program error: 0x1781"
+      ]
+    }
+  },
+  "assertions": {
+    "authorizedAmountBaseUnits": "1260000000",
+    "vendorBalanceDeltaBaseUnits": "1260000000",
+    "periodCapBaseUnits": "4000000000",
+    "delegatedAllowanceBaseUnits": "10000000000",
+    "overCapAmountBaseUnits": "5200000000",
+    "authorizedSettlementVerified": true,
+    "overCapRejected": true
+  }
+}

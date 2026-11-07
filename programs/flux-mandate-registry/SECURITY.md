@@ -54,6 +54,7 @@ layout was introduced.
 
 Pure Rust tests cover accumulation, cap rejection without mutation, fixed-window
 reset, zero amounts, inactive mandates, expiry and lifecycle transition rules.
-The Anchor build and Devnet program upgrade are verified. Do not claim successful
-end-to-end token enforcement until a synthetic Devnet transfer and rejected
-over-cap attempt are independently recorded.
+The Anchor build, Devnet program upgrade, synthetic settlement and independent
+over-cap rejection are verified. The permitted 1,260-token transfer finalized in
+slot `519741564`; the 5,200-token attempt failed in slot `519741574` with
+`6017 CapExceeded` while its SPL delegate allowance remained sufficient.

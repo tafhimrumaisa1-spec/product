@@ -27,10 +27,30 @@ https://explorer.solana.com/address/E7MjFsDybvfCaoNWopicKzB4oAtHBWTVAC5ZX9ajWJRq
 Deployment transaction:
 https://explorer.solana.com/tx/4TsPp7B8yPKhWq8NW768Cuvd88r2xdwi9XX5JthoHazoW8hpjhJhiWbnZxhKHE5QAanWn8FJ6BAj6VLjsk4TRfpA?cluster=devnet
 
-## Evidence still required
+## Golden-path enforcement evidence
 
-- Initialize a company registry with a browser-approved transaction.
-- Commit reviewed synthetic contract terms.
-- Link and activate a bounded mandate.
-- Demonstrate authorized settlement and over-cap refusal through the upgraded execution path.
-- Feed real signatures and account addresses into the public FluxProof trace.
+- Run: `9f606857-f1eb-4f1f-877b-df3f15eb6018`
+- Synthetic mint: `6ndL9DEqQayYr1KDSHSVwZW93DyxsjWgA4gXijuaqch3`
+- Company registry: `8ioBRzGG6AKQfhTA3YvXgBCXzGgmy6rSPiuz31hd3rVY`
+- Mandate: `BcAmTR6svDVZ7eAbkEhTcoDH64CA2NEw217Zn2XsJm4F`
+- Payment receipt: `8grX7vqEwnWnRW1dP7p6vLiKasoKEXMnbfRAkmfcjzPX`
+- Mandate cap: `4,000` synthetic tokens per 30-day period
+- Independent SPL delegate allowance: `10,000` synthetic tokens
+- Authorized payment: `1,260` synthetic tokens; finalized in slot `519741564`
+- Over-cap attempt: `5,200` synthetic tokens; failed in slot `519741574` with `6017 CapExceeded`
+
+Authorized payment:
+https://explorer.solana.com/tx/eDFgXQ17fLKvgt8J33k5po3nVTXqYXGE1o6ajQmjF1RkZmZLhpRyiYS8e4aSDxYWTpyC15DPbhYUApMM8xoV9xQ?cluster=devnet
+
+Rejected attempt:
+https://explorer.solana.com/tx/3sognxbcxsbcZbUhnwNKmcAoWeB2YQB97LP5yuRrRdHLoMkQL1LR6Fqo9drFPUrnkFgKGkqBpTRBZfuRPW17TwSR?cluster=devnet
+
+The complete machine-readable record is checked in at
+`packages/devnet-harness/evidence/devnet-golden-path-9f606857-f1eb-4f1f-877b-df3f15eb6018.json`.
+
+## Remaining product integration
+
+- Let a connected browser wallet create its own company, contract and mandate
+  accounts from the guided interface rather than the repeatable CLI harness.
+- Replace deterministic interactive payment replay with an explicitly confirmed
+  wallet-submitted Devnet run when a judge opts into spending Devnet SOL.
