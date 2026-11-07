@@ -35,7 +35,12 @@ pub mod flux_mandate_registry {
         commitment.created_at = Clock::get()?.unix_timestamp;
         commitment.status = ContractCommitmentStatus::Active;
         commitment.bump = ctx.bumps.contract_commitment;
-        ctx.accounts.company_registry.contract_count = ctx.accounts.company_registry.contract_count.checked_add(1).ok_or(FluxError::Overflow)?;
+        ctx.accounts.company_registry.contract_count = ctx
+            .accounts
+            .company_registry
+            .contract_count
+            .checked_add(1)
+            .ok_or(FluxError::Overflow)?;
         Ok(())
     }
 
@@ -73,13 +78,21 @@ pub mod flux_mandate_registry {
         mandate.payment_count = 0;
         mandate.status = MandateStatus::Draft;
         mandate.bump = ctx.bumps.mandate_link;
-        ctx.accounts.company_registry.mandate_count = ctx.accounts.company_registry.mandate_count.checked_add(1).ok_or(FluxError::Overflow)?;
+        ctx.accounts.company_registry.mandate_count = ctx
+            .accounts
+            .company_registry
+            .mandate_count
+            .checked_add(1)
+            .ok_or(FluxError::Overflow)?;
         Ok(())
     }
 
     pub fn set_mandate_status(ctx: Context<SetMandateStatus>, status: MandateStatus) -> Result<()> {
         let mandate = &mut ctx.accounts.mandate_link;
-        require!(mandate.status != MandateStatus::Revoked, FluxError::AlreadyRevoked);
+        require!(
+            mandate.status != MandateStatus::Revoked,
+            FluxError::AlreadyRevoked
+        );
         require!(mandate.status != status, FluxError::InvalidTransition);
 
         require!(
@@ -89,22 +102,31 @@ pub mod flux_mandate_registry {
 
         if status == MandateStatus::Active {
             let now = Clock::get()?.unix_timestamp;
-            require!(now >= mandate.starts_at && now < mandate.expires_at, FluxError::OutsideActiveWindow);
+            require!(
+                now >= mandate.starts_at && now < mandate.expires_at,
+                FluxError::OutsideActiveWindow
+            );
         }
 
         mandate.status = status;
         Ok(())
     }
 
-    pub fn execute_payment(ctx: Context<ExecutePayment>, payment_id: [u8; 32], amount: u64) -> Result<()> {
+    pub fn execute_payment(
+        ctx: Context<ExecutePayment>,
+        payment_id: [u8; 32],
+        amount: u64,
+    ) -> Result<()> {
         let now = Clock::get()?.unix_timestamp;
-        let transition = next_spend_state(&ctx.accounts.mandate_link, now, amount).map_err(spend_rule_error)?;
+        let transition =
+            next_spend_state(&ctx.accounts.mandate_link, now, amount).map_err(spend_rule_error)?;
 
         let mandate_key = ctx.accounts.mandate_link.key();
         let company = ctx.accounts.mandate_link.company;
         let mandate_id = ctx.accounts.mandate_link.mandate_id;
         let bump = ctx.accounts.mandate_link.bump;
-        let signer_seeds: &[&[&[u8]]] = &[&[b"mandate", company.as_ref(), mandate_id.as_ref(), &[bump]]];
+        let signer_seeds: &[&[&[u8]]] =
+            &[&[b"mandate", company.as_ref(), mandate_id.as_ref(), &[bump]]];
 
         token::transfer_checked(
             CpiContext::new_with_signer(
@@ -124,7 +146,10 @@ pub mod flux_mandate_registry {
         let mandate = &mut ctx.accounts.mandate_link;
         mandate.period_index = transition.period_index;
         mandate.spent_in_period = transition.spent_in_period;
-        mandate.payment_count = mandate.payment_count.checked_add(1).ok_or(FluxError::Overflow)?;
+        mandate.payment_count = mandate
+            .payment_count
+            .checked_add(1)
+            .ok_or(FluxError::Overflow)?;
 
         let receipt = &mut ctx.accounts.payment_receipt;
         receipt.mandate = mandate_key;
@@ -155,7 +180,8 @@ pub mod flux_mandate_registry {
 #[derive(Accounts)]
 #[instruction(company_id: [u8; 32])]
 pub struct InitializeCompany<'info> {
-    #[account(mut)] pub authority: Signer<'info>,
+    #[account(mut)]
+    pub authority: Signer<'info>,
     #[account(init, payer = authority, space = 8 + CompanyRegistry::INIT_SPACE, seeds = [b"company", authority.key().as_ref(), company_id.as_ref()], bump)]
     pub company_registry: Account<'info, CompanyRegistry>,
     pub system_program: Program<'info, System>,
@@ -164,8 +190,10 @@ pub struct InitializeCompany<'info> {
 #[derive(Accounts)]
 #[instruction(contract_id: [u8; 32])]
 pub struct CommitContract<'info> {
-    #[account(mut)] pub authority: Signer<'info>,
-    #[account(mut, has_one = authority)] pub company_registry: Account<'info, CompanyRegistry>,
+    #[account(mut)]
+    pub authority: Signer<'info>,
+    #[account(mut, has_one = authority)]
+    pub company_registry: Account<'info, CompanyRegistry>,
     #[account(init, payer = authority, space = 8 + ContractCommitment::INIT_SPACE, seeds = [b"contract", company_registry.key().as_ref(), contract_id.as_ref()], bump)]
     pub contract_commitment: Account<'info, ContractCommitment>,
     pub system_program: Program<'info, System>,
@@ -174,8 +202,10 @@ pub struct CommitContract<'info> {
 #[derive(Accounts)]
 #[instruction(mandate_id: [u8; 32])]
 pub struct LinkMandate<'info> {
-    #[account(mut)] pub authority: Signer<'info>,
-    #[account(mut, has_one = authority)] pub company_registry: Account<'info, CompanyRegistry>,
+    #[account(mut)]
+    pub authority: Signer<'info>,
+    #[account(mut, has_one = authority)]
+    pub company_registry: Account<'info, CompanyRegistry>,
     #[account(
         constraint = contract_commitment.company == company_registry.key(),
         constraint = contract_commitment.status == ContractCommitmentStatus::Active @ FluxError::ContractInactive
@@ -229,7 +259,8 @@ pub struct ExecutePayment<'info> {
 #[derive(Accounts)]
 pub struct SetMandateStatus<'info> {
     pub authority: Signer<'info>,
-    #[account(has_one = authority)] pub company_registry: Account<'info, CompanyRegistry>,
+    #[account(has_one = authority)]
+    pub company_registry: Account<'info, CompanyRegistry>,
     #[account(mut, constraint = mandate_link.company == company_registry.key())]
     pub mandate_link: Account<'info, MandateLink>,
 }
@@ -295,10 +326,20 @@ pub struct PaymentReceipt {
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, InitSpace, PartialEq, Eq)]
-pub enum ContractCommitmentStatus { Active, Superseded, Revoked }
+pub enum ContractCommitmentStatus {
+    Active,
+    Superseded,
+    Revoked,
+}
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, InitSpace, PartialEq, Eq)]
-pub enum MandateStatus { Draft, Active, Paused, Expired, Revoked }
+pub enum MandateStatus {
+    Draft,
+    Active,
+    Paused,
+    Expired,
+    Revoked,
+}
 
 #[event]
 pub struct PaymentExecuted {
@@ -314,10 +355,20 @@ pub struct PaymentExecuted {
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-struct SpendTransition { period_index: u64, spent_in_period: u64 }
+struct SpendTransition {
+    period_index: u64,
+    spent_in_period: u64,
+}
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-enum SpendRuleError { ZeroAmount, Inactive, OutsideWindow, InvalidPeriod, CapExceeded, Overflow }
+enum SpendRuleError {
+    ZeroAmount,
+    Inactive,
+    OutsideWindow,
+    InvalidPeriod,
+    CapExceeded,
+    Overflow,
+}
 
 fn valid_mandate_transition(current: MandateStatus, requested: MandateStatus) -> bool {
     matches!(
@@ -334,18 +385,45 @@ fn valid_mandate_transition(current: MandateStatus, requested: MandateStatus) ->
     )
 }
 
-fn next_spend_state(mandate: &MandateLink, now: i64, amount: u64) -> core::result::Result<SpendTransition, SpendRuleError> {
-    if amount == 0 { return Err(SpendRuleError::ZeroAmount); }
-    if mandate.status != MandateStatus::Active { return Err(SpendRuleError::Inactive); }
-    if now < mandate.starts_at || now >= mandate.expires_at { return Err(SpendRuleError::OutsideWindow); }
-    if mandate.period_seconds <= 0 { return Err(SpendRuleError::InvalidPeriod); }
-    let elapsed = now.checked_sub(mandate.starts_at).ok_or(SpendRuleError::Overflow)?;
-    let raw_index = elapsed.checked_div(mandate.period_seconds).ok_or(SpendRuleError::InvalidPeriod)?;
+fn next_spend_state(
+    mandate: &MandateLink,
+    now: i64,
+    amount: u64,
+) -> core::result::Result<SpendTransition, SpendRuleError> {
+    if amount == 0 {
+        return Err(SpendRuleError::ZeroAmount);
+    }
+    if mandate.status != MandateStatus::Active {
+        return Err(SpendRuleError::Inactive);
+    }
+    if now < mandate.starts_at || now >= mandate.expires_at {
+        return Err(SpendRuleError::OutsideWindow);
+    }
+    if mandate.period_seconds <= 0 {
+        return Err(SpendRuleError::InvalidPeriod);
+    }
+    let elapsed = now
+        .checked_sub(mandate.starts_at)
+        .ok_or(SpendRuleError::Overflow)?;
+    let raw_index = elapsed
+        .checked_div(mandate.period_seconds)
+        .ok_or(SpendRuleError::InvalidPeriod)?;
     let period_index = u64::try_from(raw_index).map_err(|_| SpendRuleError::Overflow)?;
-    let already_spent = if period_index == mandate.period_index { mandate.spent_in_period } else { 0 };
-    let spent_in_period = already_spent.checked_add(amount).ok_or(SpendRuleError::Overflow)?;
-    if spent_in_period > mandate.period_cap { return Err(SpendRuleError::CapExceeded); }
-    Ok(SpendTransition { period_index, spent_in_period })
+    let already_spent = if period_index == mandate.period_index {
+        mandate.spent_in_period
+    } else {
+        0
+    };
+    let spent_in_period = already_spent
+        .checked_add(amount)
+        .ok_or(SpendRuleError::Overflow)?;
+    if spent_in_period > mandate.period_cap {
+        return Err(SpendRuleError::CapExceeded);
+    }
+    Ok(SpendTransition {
+        period_index,
+        spent_in_period,
+    })
 }
 
 fn spend_rule_error(error: SpendRuleError) -> anchor_lang::error::Error {
@@ -361,25 +439,44 @@ fn spend_rule_error(error: SpendRuleError) -> anchor_lang::error::Error {
 
 #[error_code]
 pub enum FluxError {
-    #[msg("Contract version must be positive.")] InvalidVersion,
-    #[msg("Period cap must be positive.")] InvalidCap,
-    #[msg("Period duration must be positive.")] InvalidPeriod,
-    #[msg("Payment amount must be positive.")] InvalidAmount,
-    #[msg("Mandate expiry must be after its start.")] InvalidWindow,
-    #[msg("The mandate is already revoked.")] AlreadyRevoked,
-    #[msg("The requested mandate status transition is not allowed.")] InvalidTransition,
-    #[msg("The mandate cannot be activated outside its authorized window.")] OutsideActiveWindow,
-    #[msg("The contract commitment is not active.")] ContractInactive,
-    #[msg("The mandate is not active.")] MandateInactive,
-    #[msg("The signer is not the mandate's authorized agent.")] WrongAgent,
-    #[msg("The source token account is not bound to this mandate.")] WrongSource,
-    #[msg("The payment uses an unauthorized asset mint.")] WrongAsset,
-    #[msg("The destination token account is not owned by the authorized vendor.")] WrongVendor,
-    #[msg("The mandate PDA is not the approved token-account delegate.")] MissingDelegation,
-    #[msg("The SPL delegation allowance is insufficient.")] InsufficientDelegatedAllowance,
-    #[msg("The delegated source token account balance is insufficient.")] InsufficientSourceBalance,
-    #[msg("The payment exceeds the current period cap.")] CapExceeded,
-    #[msg("Counter overflow.")] Overflow,
+    #[msg("Contract version must be positive.")]
+    InvalidVersion,
+    #[msg("Period cap must be positive.")]
+    InvalidCap,
+    #[msg("Period duration must be positive.")]
+    InvalidPeriod,
+    #[msg("Payment amount must be positive.")]
+    InvalidAmount,
+    #[msg("Mandate expiry must be after its start.")]
+    InvalidWindow,
+    #[msg("The mandate is already revoked.")]
+    AlreadyRevoked,
+    #[msg("The requested mandate status transition is not allowed.")]
+    InvalidTransition,
+    #[msg("The mandate cannot be activated outside its authorized window.")]
+    OutsideActiveWindow,
+    #[msg("The contract commitment is not active.")]
+    ContractInactive,
+    #[msg("The mandate is not active.")]
+    MandateInactive,
+    #[msg("The signer is not the mandate's authorized agent.")]
+    WrongAgent,
+    #[msg("The source token account is not bound to this mandate.")]
+    WrongSource,
+    #[msg("The payment uses an unauthorized asset mint.")]
+    WrongAsset,
+    #[msg("The destination token account is not owned by the authorized vendor.")]
+    WrongVendor,
+    #[msg("The mandate PDA is not the approved token-account delegate.")]
+    MissingDelegation,
+    #[msg("The SPL delegation allowance is insufficient.")]
+    InsufficientDelegatedAllowance,
+    #[msg("The delegated source token account balance is insufficient.")]
+    InsufficientSourceBalance,
+    #[msg("The payment exceeds the current period cap.")]
+    CapExceeded,
+    #[msg("Counter overflow.")]
+    Overflow,
 }
 
 #[cfg(test)]
@@ -388,52 +485,110 @@ mod tests {
 
     fn mandate() -> MandateLink {
         MandateLink {
-            company: Pubkey::new_unique(), contract_commitment: Pubkey::new_unique(), mandate_id: [7; 32], obligation_id: [8; 32],
-            agent: Pubkey::new_unique(), vendor: Pubkey::new_unique(), delegation: Pubkey::new_unique(), asset_mint: Pubkey::new_unique(),
-            period_cap: 4_000_000, period_seconds: 30 * 24 * 60 * 60, starts_at: 1_000,
-            expires_at: 1_000 + (90 * 24 * 60 * 60), period_index: 0, spent_in_period: 0, payment_count: 0,
-            status: MandateStatus::Active, bump: 255,
+            company: Pubkey::new_unique(),
+            contract_commitment: Pubkey::new_unique(),
+            mandate_id: [7; 32],
+            obligation_id: [8; 32],
+            agent: Pubkey::new_unique(),
+            vendor: Pubkey::new_unique(),
+            delegation: Pubkey::new_unique(),
+            asset_mint: Pubkey::new_unique(),
+            period_cap: 4_000_000,
+            period_seconds: 30 * 24 * 60 * 60,
+            starts_at: 1_000,
+            expires_at: 1_000 + (90 * 24 * 60 * 60),
+            period_index: 0,
+            spent_in_period: 0,
+            payment_count: 0,
+            status: MandateStatus::Active,
+            bump: 255,
         }
     }
 
     #[test]
     fn accumulates_inside_period() {
-        let mut m = mandate(); m.spent_in_period = 1_260_000;
-        assert_eq!(next_spend_state(&m, 2_000, 2_000_000), Ok(SpendTransition { period_index: 0, spent_in_period: 3_260_000 }));
+        let mut m = mandate();
+        m.spent_in_period = 1_260_000;
+        assert_eq!(
+            next_spend_state(&m, 2_000, 2_000_000),
+            Ok(SpendTransition {
+                period_index: 0,
+                spent_in_period: 3_260_000
+            })
+        );
     }
 
     #[test]
     fn rejects_cap_excess_without_mutation() {
         let m = mandate();
-        assert_eq!(next_spend_state(&m, 2_000, 4_000_001), Err(SpendRuleError::CapExceeded));
+        assert_eq!(
+            next_spend_state(&m, 2_000, 4_000_001),
+            Err(SpendRuleError::CapExceeded)
+        );
         assert_eq!(m.spent_in_period, 0);
     }
 
     #[test]
     fn resets_at_fixed_period_boundary() {
-        let mut m = mandate(); m.spent_in_period = m.period_cap;
-        assert_eq!(next_spend_state(&m, m.starts_at + m.period_seconds, 500_000), Ok(SpendTransition { period_index: 1, spent_in_period: 500_000 }));
+        let mut m = mandate();
+        m.spent_in_period = m.period_cap;
+        assert_eq!(
+            next_spend_state(&m, m.starts_at + m.period_seconds, 500_000),
+            Ok(SpendTransition {
+                period_index: 1,
+                spent_in_period: 500_000
+            })
+        );
     }
 
     #[test]
     fn rejects_zero_inactive_and_outside_window() {
         let mut m = mandate();
-        assert_eq!(next_spend_state(&m, 2_000, 0), Err(SpendRuleError::ZeroAmount));
+        assert_eq!(
+            next_spend_state(&m, 2_000, 0),
+            Err(SpendRuleError::ZeroAmount)
+        );
         m.status = MandateStatus::Paused;
-        assert_eq!(next_spend_state(&m, 2_000, 1), Err(SpendRuleError::Inactive));
+        assert_eq!(
+            next_spend_state(&m, 2_000, 1),
+            Err(SpendRuleError::Inactive)
+        );
         m.status = MandateStatus::Active;
-        assert_eq!(next_spend_state(&m, m.expires_at, 1), Err(SpendRuleError::OutsideWindow));
+        assert_eq!(
+            next_spend_state(&m, m.expires_at, 1),
+            Err(SpendRuleError::OutsideWindow)
+        );
     }
 
     #[test]
     fn lifecycle_allows_pause_resume_and_terminal_revoke_only() {
-        assert!(valid_mandate_transition(MandateStatus::Draft, MandateStatus::Active));
-        assert!(valid_mandate_transition(MandateStatus::Active, MandateStatus::Paused));
-        assert!(valid_mandate_transition(MandateStatus::Paused, MandateStatus::Active));
-        assert!(valid_mandate_transition(MandateStatus::Expired, MandateStatus::Revoked));
-        assert!(!valid_mandate_transition(MandateStatus::Draft, MandateStatus::Paused));
-        assert!(!valid_mandate_transition(MandateStatus::Revoked, MandateStatus::Active));
-        assert!(!valid_mandate_transition(MandateStatus::Active, MandateStatus::Active));
+        assert!(valid_mandate_transition(
+            MandateStatus::Draft,
+            MandateStatus::Active
+        ));
+        assert!(valid_mandate_transition(
+            MandateStatus::Active,
+            MandateStatus::Paused
+        ));
+        assert!(valid_mandate_transition(
+            MandateStatus::Paused,
+            MandateStatus::Active
+        ));
+        assert!(valid_mandate_transition(
+            MandateStatus::Expired,
+            MandateStatus::Revoked
+        ));
+        assert!(!valid_mandate_transition(
+            MandateStatus::Draft,
+            MandateStatus::Paused
+        ));
+        assert!(!valid_mandate_transition(
+            MandateStatus::Revoked,
+            MandateStatus::Active
+        ));
+        assert!(!valid_mandate_transition(
+            MandateStatus::Active,
+            MandateStatus::Active
+        ));
     }
 }
-

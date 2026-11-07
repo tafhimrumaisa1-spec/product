@@ -204,6 +204,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "anchor-spl"
+version = "1.2.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0026a28b86a248dfd046b3e9ac726c5f9c07840b3f66446287c4c8edc13b6224"
+dependencies = [
+ "anchor-lang",
+]
+
+[[package]]
 name = "anchor-syn"
 version = "1.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -551,6 +560,7 @@ name = "flux-mandate-registry"
 version = "0.1.0"
 dependencies = [
  "anchor-lang",
+ "anchor-spl",
 ]
 
 [[package]]
