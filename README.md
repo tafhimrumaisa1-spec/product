@@ -11,10 +11,13 @@ FluxMandate converts commercial agreements into reviewed obligations, determinis
 ## Workspace
 
 - `apps/web` — public explanation and no-login guided demo
+- `packages/contracts` — evidence-bound extraction and human-only obligation review
+- `packages/graph` — strict economic graph, lifecycle machines and audit-chain validation
 - `packages/domain` — shared FluxGraph types and lifecycle rules
-- `packages/twin` — deterministic FluxTwin calculations
+- `packages/twin` — compatibility calculator plus full multi-scenario FluxTwin engine
+- `packages/devnet-harness` — reproducible synthetic Devnet enforcement proof
 - `programs/flux-mandate-registry` — Anchor semantic registry
-- `docs` — architecture, demo, and agent integration notes
+- `docs` — architecture, evidence and reconciled submission materials
 
 ## Implemented demo
 

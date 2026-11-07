@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "scripts": { "typecheck": "tsc --noEmit" },
-  "devDependencies": { "typescript": "latest" }
+  "scripts": { "typecheck": "tsc --noEmit", "test": "tsx --test tests/*.test.ts" },
+  "devDependencies": { "@types/node": "latest", "tsx": "^4.20.0", "typescript": "latest" }
 }
 

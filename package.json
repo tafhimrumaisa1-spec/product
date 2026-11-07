@@ -10,8 +10,8 @@
     "dev": "npm --prefix apps/web run dev",
     "build": "npm --prefix apps/web run build",
     "devnet:golden-path": "npm --prefix packages/devnet-harness run golden-path",
-    "typecheck": "npm --prefix apps/web run typecheck && npm --prefix packages/devnet-harness run typecheck && npm --prefix packages/domain run typecheck && npm --prefix packages/twin run typecheck && npm --prefix packages/flow run typecheck && npm --prefix packages/ledger-proof run typecheck && npm --prefix packages/registry-client run typecheck && npm --prefix packages/shell-ui run typecheck",
-    "test": "npm --prefix packages/flow test && npm --prefix packages/ledger-proof test && npm --prefix packages/registry-client test && npm --prefix packages/shell-ui test",
+    "typecheck": "npm --prefix apps/web run typecheck && npm --prefix packages/contracts run typecheck && npm --prefix packages/devnet-harness run typecheck && npm --prefix packages/domain run typecheck && npm --prefix packages/flow run typecheck && npm --prefix packages/graph run typecheck && npm --prefix packages/ledger-proof run typecheck && npm --prefix packages/registry-client run typecheck && npm --prefix packages/shell-ui run typecheck && npm --prefix packages/twin run typecheck",
+    "test": "npm --prefix packages/contracts test && npm --prefix packages/flow test && npm --prefix packages/graph test && npm --prefix packages/ledger-proof test && npm --prefix packages/registry-client test && npm --prefix packages/shell-ui test && npm --prefix packages/twin test",
     "verify": "npm run typecheck && npm test"
   },
   "engines": {

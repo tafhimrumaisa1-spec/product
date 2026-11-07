@@ -1,0 +1,30 @@
+/** Names of all immutable domain events. Schemas live in events.ts; this list is import-cycle-free for the state machines. */
+export const EVENT_TYPES = [
+  "ContractUploaded",
+  "TermsExtracted",
+  "ExtractionFailed",
+  "ObligationProposed",
+  "ObligationApproved",
+  "ObligationRejected",
+  "ContractActivated",
+  "ScenarioCalculated",
+  "TwinUpdated",
+  "MandateProposed",
+  "MandateApproved",
+  "MandateActivated",
+  "MandateSuspended",
+  "MandateRevoked",
+  "SpendRequested",
+  "SpendApproved",
+  "SpendBlocked",
+  "SpendEscalated",
+  "SpendSubmitted",
+  "SettlementConfirmed",
+  "SettlementFailed",
+  "LedgerEntryPosted",
+  "SettlementReconciled",
+  "TaskEconomicsRecorded",
+  "LifecycleTransitioned",
+] as const;
+
+export type DomainEventType = (typeof EVENT_TYPES)[number];

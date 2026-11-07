@@ -43,3 +43,11 @@ function runway(cash: bigint, monthlyBurn: bigint): number | null {
 
 function max(a: bigint, b: bigint) { return a > b ? a : b; }
 
+// Full scenario engine. The original simulateTwin API remains stable for the
+// guided UI while richer product surfaces adopt these validated projections.
+export { runTwin, computeTwin, buildComparison } from "./advanced/engine";
+export { validateTwinInput } from "./advanced/validate";
+export { buildScenarios, DEFAULT_BASE_ASSUMPTIONS } from "./advanced/scenarios";
+export { goldenDemoInput } from "./advanced/fixtures/golden-demo";
+export { formatMonthsX100, comparableRunwayX100 } from "./advanced/facts";
+

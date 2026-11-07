@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Image from "next/image";
 import type { ExtractionResult } from "@/lib/flux-contracts";
 import { DEVNET_EVIDENCE, devnetTransaction } from "@/lib/devnet-evidence";
 import { WalletConnect } from "./wallet-connect";
@@ -116,7 +117,7 @@ export function FluxExperience() {
     <main>
       <nav className="topbar">
         <a className="brand" href="#top" aria-label="FluxMandate home">
-          <span className="brand-mark" aria-hidden="true">FM</span>
+          <span className="brand-mark"><Image src="/fluxmandate-logo.png" alt="" width={34} height={34} priority /></span>
           <span>FluxMandate</span>
         </a>
         <div className="nav-links">
@@ -179,7 +180,7 @@ export function FluxExperience() {
       <section id="demo" className={`demo-section ${demoOpen ? "demo-open" : ""}`}>
         <div className="demo-frame">
           <aside className="demo-sidebar">
-            <div className="mini-brand"><span className="brand-mark">FM</span><b>Command</b></div>
+            <div className="mini-brand"><span className="brand-mark"><Image src="/fluxmandate-logo.png" alt="" width={34} height={34} /></span><b>Command</b></div>
             <div className="company-chip"><small>DEMO COMPANY</small><strong>Northstar AI</strong><span>Runway before · {twinScenario.runwayBeforeMonths?.toFixed(1)} mo</span></div>
             <nav>
               {steps.map((name, index) => (

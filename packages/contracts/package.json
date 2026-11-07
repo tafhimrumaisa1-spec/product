@@ -1,0 +1,12 @@
+{
+  "name": "@fluxmandate/contracts",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": { ".": "./src/index.ts" },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test tests/*.test.ts"
+  },
+  "devDependencies": { "@types/node": "latest", "tsx": "^4.20.0", "typescript": "latest" }
+}
