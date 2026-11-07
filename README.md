@@ -16,6 +16,18 @@ FluxMandate converts commercial agreements into reviewed obligations, determinis
 - `programs/flux-mandate-registry` — Anchor semantic registry
 - `docs` — architecture, demo, and agent integration notes
 
+## Implemented demo
+
+- Live Groq contract extraction with strict server-side validation
+- Human approval checkpoint before authority creation
+- Deterministic FluxTwin runway and safe-to-deploy calculations
+- Local Anchor registry for contract commitments and mandate state
+- Explicit Live AI and Verified Replay modes
+- Phantom browser connection on Solana Devnet
+- Synthetic in-limit settlement and over-limit rejection scenarios
+
+Replay mode is intentionally labelled and remains available when an AI provider or Devnet is unavailable.
+
 ## Local development
 
 Run from Ubuntu/WSL:
@@ -27,6 +39,8 @@ npm run dev
 ```
 
 Open `http://localhost:3000`.
+
+Copy `apps/web/.env.example` to `apps/web/.env.local` and provide a server-only `GROQ_API_KEY` to use live extraction. Never prefix AI secrets with `NEXT_PUBLIC_`.
 
 ## Safety
 

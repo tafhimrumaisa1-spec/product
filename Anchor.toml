@@ -1,22 +1,25 @@
 [toolchain]
 anchor_version = "1.2.2"
-solana_version = "=4.1.2"
-package_manager = "npm"
+solana_version = "4.1.2"
+package_manager = "pnpm"
 
 [features]
 resolution = true
 skip-lint = false
 
 [programs.localnet]
-flux_mandate_registry = "Fg6PaFpoGXkYsidMpWxTWqkZb6W2BeZ7FEfcYkgMQhg"
+flux_mandate_registry = "E7MjFsDybvfCaoNWopicKzB4oAtHBWTVAC5ZX9ajWJRq"
 
 [provider]
-cluster = "Localnet"
+cluster = "localnet"
 wallet = "~/.config/solana/id.json"
-
-[test]
-startup_wait = 30000
 
 [scripts]
 test = "cargo test"
 
+[hooks]
+
+[test]
+startup_wait = 30000
+shutdown_wait = 2000
+upgradeable = false

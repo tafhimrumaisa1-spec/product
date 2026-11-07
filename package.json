@@ -2,10 +2,16 @@
   "name": "fluxmandate",
   "version": "0.1.0",
   "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
     "dev": "npm --prefix apps/web run dev",
     "build": "npm --prefix apps/web run build",
-    "typecheck": "npm --prefix apps/web run typecheck"
+    "typecheck": "npm --prefix apps/web run typecheck && npm --prefix packages/domain run typecheck && npm --prefix packages/twin run typecheck && npm --prefix packages/flow run typecheck && npm --prefix packages/ledger-proof run typecheck && npm --prefix packages/shell-ui run typecheck",
+    "test": "npm --prefix packages/flow test && npm --prefix packages/ledger-proof test && npm --prefix packages/shell-ui test",
+    "verify": "npm run typecheck && npm test"
   },
   "engines": {
     "node": ">=24"

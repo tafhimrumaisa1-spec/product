@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-declare_id!("Fg6PaFpoGXkYsidMpWxTWqkZb6W2BeZ7FEfcYkgMQhg");
+declare_id!("E7MjFsDybvfCaoNWopicKzB4oAtHBWTVAC5ZX9ajWJRq");
 
 #[program]
 pub mod flux_mandate_registry {
@@ -71,8 +71,30 @@ pub mod flux_mandate_registry {
     }
 
     pub fn set_mandate_status(ctx: Context<SetMandateStatus>, status: MandateStatus) -> Result<()> {
-        require!(ctx.accounts.mandate_link.status != MandateStatus::Revoked, FluxError::AlreadyRevoked);
-        ctx.accounts.mandate_link.status = status;
+        let mandate = &mut ctx.accounts.mandate_link;
+        require!(mandate.status != MandateStatus::Revoked, FluxError::AlreadyRevoked);
+        require!(mandate.status != status, FluxError::InvalidTransition);
+
+        let valid_transition = matches!(
+            (mandate.status, status),
+            (MandateStatus::Draft, MandateStatus::Active)
+                | (MandateStatus::Draft, MandateStatus::Revoked)
+                | (MandateStatus::Active, MandateStatus::Paused)
+                | (MandateStatus::Active, MandateStatus::Expired)
+                | (MandateStatus::Active, MandateStatus::Revoked)
+                | (MandateStatus::Paused, MandateStatus::Active)
+                | (MandateStatus::Paused, MandateStatus::Expired)
+                | (MandateStatus::Paused, MandateStatus::Revoked)
+                | (MandateStatus::Expired, MandateStatus::Revoked)
+        );
+        require!(valid_transition, FluxError::InvalidTransition);
+
+        if status == MandateStatus::Active {
+            let now = Clock::get()?.unix_timestamp;
+            require!(now >= mandate.starts_at && now < mandate.expires_at, FluxError::OutsideActiveWindow);
+        }
+
+        mandate.status = status;
         Ok(())
     }
 }
@@ -170,6 +192,8 @@ pub enum FluxError {
     #[msg("Period cap must be positive.")] InvalidCap,
     #[msg("Mandate expiry must be after its start.")] InvalidWindow,
     #[msg("The mandate is already revoked.")] AlreadyRevoked,
+    #[msg("The requested mandate status transition is not allowed.")] InvalidTransition,
+    #[msg("The mandate cannot be activated outside its authorized window.")] OutsideActiveWindow,
     #[msg("Counter overflow.")] Overflow,
 }
 

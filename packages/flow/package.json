@@ -1,0 +1,36 @@
+{
+  "name": "@fluxmandate/flow",
+  "version": "0.1.0",
+  "private": true,
+  "description": "FluxFlow: execution and payment routing for FluxMandate (Devnet / local only).",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "types": "./src/index.ts",
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "tsx --test tests/*.test.ts"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "peerDependencies": {
+    "@solana/kit": "*",
+    "@solana/kit-plugin-rpc": "*",
+    "@solana/kit-plugin-signer": "*",
+    "@solana/subscriptions": "*",
+    "@solana-program/token": "*"
+  },
+  "peerDependenciesMeta": {
+    "@solana/kit": { "optional": true },
+    "@solana/kit-plugin-rpc": { "optional": true },
+    "@solana/kit-plugin-signer": { "optional": true },
+    "@solana/subscriptions": { "optional": true },
+    "@solana-program/token": { "optional": true }
+  },
+  "devDependencies": {
+    "typescript": ">=5.5",
+    "tsx": "^4.0.0"
+  }
+}

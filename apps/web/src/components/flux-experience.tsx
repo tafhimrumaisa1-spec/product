@@ -1,15 +1,18 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import type { ExtractionResult } from "@/lib/flux-contracts";
+import { WalletConnect } from "./wallet-connect";
+import { simulateTwin } from "../../../../packages/twin/src/index";
 
 const steps = ["Contract", "Review", "Twin", "Mandate", "Agent", "Proof"];
 
 const obligations = [
-  { label: "Counterparty", value: "Axiom Compute Labs", source: "Page 1 · Parties" },
-  { label: "Commitment", value: "$12,000 total", source: "§3.1 · Fees" },
-  { label: "Payment limit", value: "$4,000 / 30 days", source: "§3.2 · Schedule" },
-  { label: "Term", value: "3 months", source: "§2.1 · Term" },
-  { label: "Renewal", value: "Human approval required", source: "§7.2 · Renewal" },
+  { label: "Counterparty", value: "Axiom Compute Labs", source: "Page 1 · Parties", confidence: "99%" },
+  { label: "Commitment", value: "$12,000 total", source: "§3.1 · Fees", confidence: "98%" },
+  { label: "Payment limit", value: "$4,000 / 30 days", source: "§3.2 · Schedule", confidence: "97%" },
+  { label: "Term", value: "3 months", source: "§2.1 · Term", confidence: "96%" },
+  { label: "Renewal", value: "Human approval required", source: "§7.2 · Renewal", confidence: "Review" },
 ];
 
 const trace = [
@@ -21,11 +24,24 @@ const trace = [
   ["Ledger", "Infrastructure · posted"],
 ];
 
+const twinScenario = simulateTwin({
+  cashMinor: 8_420_000n,
+  monthlyRevenueMinor: 5_000_000n,
+  monthlyBurnMinor: 5_880_000n,
+  existingCommittedMinor: 1_540_000n,
+  proposedMonthlyObligationMinor: 400_000n,
+  proposedPeriods: 3,
+  reserveMonths: 3,
+});
+
 export function FluxExperience() {
   const [demoOpen, setDemoOpen] = useState(false);
   const [step, setStep] = useState(0);
   const [approved, setApproved] = useState(false);
   const [paymentState, setPaymentState] = useState<"idle" | "settled" | "blocked">("idle");
+  const [extraction, setExtraction] = useState<ExtractionResult | null>(null);
+  const [extracting, setExtracting] = useState(false);
+  const [demoMode, setDemoMode] = useState<"live" | "replay">("live");
 
   const progress = useMemo(() => `${Math.round(((step + 1) / steps.length) * 100)}%`, [step]);
 
@@ -40,6 +56,22 @@ export function FluxExperience() {
     setStep((current) => Math.min(current + 1, steps.length - 1));
   }
 
+  async function extractContract() {
+    setExtracting(true);
+    try {
+      const response = await fetch("/api/contracts/extract", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mode: demoMode, contractText: syntheticContract }),
+      });
+      if (!response.ok) throw new Error("Extraction request failed");
+      setExtraction(await response.json() as ExtractionResult);
+      setStep(1);
+    } finally {
+      setExtracting(false);
+    }
+  }
+
   return (
     <main>
       <nav className="topbar">
@@ -51,7 +83,7 @@ export function FluxExperience() {
           <a href="#system">System</a>
           <a href="#proof">Proof</a>
           <span className="network-pill"><i /> Devnet ready</span>
-          <button className="button button-small" onClick={launchDemo}>Launch demo</button>
+          <WalletConnect />
         </div>
       </nav>
 
@@ -108,7 +140,7 @@ export function FluxExperience() {
         <div className="demo-frame">
           <aside className="demo-sidebar">
             <div className="mini-brand"><span className="brand-mark">FM</span><b>Command</b></div>
-            <div className="company-chip"><small>DEMO COMPANY</small><strong>Northstar AI</strong><span>Runway · 14.2 mo</span></div>
+            <div className="company-chip"><small>DEMO COMPANY</small><strong>Northstar AI</strong><span>Runway before · {twinScenario.runwayBeforeMonths?.toFixed(1)} mo</span></div>
             <nav>
               {steps.map((name, index) => (
                 <button key={name} className={index === step ? "active" : index < step ? "complete" : ""} onClick={() => setStep(index)}>
@@ -122,12 +154,15 @@ export function FluxExperience() {
           <div className="demo-workspace">
             <header className="demo-header">
               <div><small>GUIDED DEMO / {steps[step].toUpperCase()}</small><h2>{demoTitle(step)}</h2></div>
-              <div className="progress-wrap"><span>{progress}</span><div><i style={{ width: progress }} /></div></div>
+              <div className="demo-controls">
+                <div className="mode-switch" aria-label="Demo mode"><button className={demoMode === "live" ? "active" : ""} onClick={() => setDemoMode("live")}>Live AI</button><button className={demoMode === "replay" ? "active" : ""} onClick={() => setDemoMode("replay")}>Replay</button></div>
+                <div className="progress-wrap"><span>{progress}</span><div><i style={{ width: progress }} /></div></div>
+              </div>
             </header>
 
             <div className="demo-content">
-              {step === 0 && <ContractStage onNext={advance} />}
-              {step === 1 && <ReviewStage approved={approved} onNext={advance} />}
+              {step === 0 && <ContractStage onNext={extractContract} extracting={extracting} />}
+              {step === 1 && <ReviewStage approved={approved} extraction={extraction} onNext={advance} />}
               {step === 2 && <TwinStage onNext={advance} />}
               {step === 3 && <MandateStage onNext={advance} />}
               {step === 4 && <AgentStage state={paymentState} setState={setPaymentState} onNext={advance} />}
@@ -166,22 +201,46 @@ function StageShell({ tag, title, copy, children, action, onNext }: { tag: strin
   return <div className="stage"><div className="stage-intro"><span className="stage-tag">{tag}</span><h3>{title}</h3><p>{copy}</p></div>{children}<button className="button button-primary stage-action" onClick={onNext}>{action} <span>→</span></button></div>;
 }
 
-function ContractStage({ onNext }: { onNext: () => void }) {
-  return <StageShell tag="FluxContracts" title="A synthetic agreement is ready." copy="The complete document remains private. Only reviewed economic meaning can become authority." action="Extract obligations" onNext={onNext}>
+function ContractStage({ onNext, extracting }: { onNext: () => void; extracting: boolean }) {
+  return <StageShell tag="FluxContracts" title="A synthetic agreement is ready." copy="The complete document remains private. Only reviewed economic meaning can become authority." action={extracting ? "Extracting with Groq…" : "Extract obligations"} onNext={onNext}>
     <div className="document-card"><div className="document-icon">PDF</div><div><small>SYNTHETIC CONTRACT</small><h4>Axiom Compute Services Agreement</h4><p>3 pages · signed · SHA-256 commitment ready</p></div><span className="status status-neutral">Private</span></div>
     <div className="notice"><b>What AI will do</b><span>Propose structured terms with clause-level evidence. It cannot approve or sign.</span></div>
   </StageShell>;
 }
 
-function ReviewStage({ approved, onNext }: { approved: boolean; onNext: () => void }) {
+function ReviewStage({ approved, extraction, onNext }: { approved: boolean; extraction: ExtractionResult | null; onNext: () => void }) {
+  const proposed = extraction ? proposalRows(extraction) : obligations;
   return <StageShell tag="Human checkpoint" title={approved ? "Material terms approved." : "Every claim carries its evidence."} copy="Review the commercial meaning before it becomes financial authority." action={approved ? "Continue to Twin" : "Approve all terms"} onNext={onNext}>
-    <div className="obligation-grid">{obligations.map((item) => <article key={item.label}><small>{item.label}</small><strong>{item.value}</strong><span>{item.source}</span><i className="confidence">96%</i></article>)}</div>
+    {extraction && <div className="extraction-mode"><i className="signal" /><b>{extraction.mode === "live" ? "Live Groq extraction" : "Verified deterministic replay"}</b><span>Human approval required</span></div>}
+    <div className="obligation-grid">{proposed.map((item) => <article key={item.label}><small>{item.label}</small><strong>{item.value}</strong><span>{item.source}</span><i className="confidence">{item.confidence}</i></article>)}</div>
   </StageShell>;
 }
 
+function proposalRows(result: ExtractionResult) {
+  const proposal = result.proposal;
+  const confidence = proposal.evidence[0] ? `${Math.round(proposal.evidence[0].confidenceBps / 100)}%` : "Review";
+  return [
+    { label: "Counterparty", value: proposal.counterparty, source: proposal.evidence[0]?.clause || "AI proposal", confidence },
+    { label: "Commitment", value: `${formatMinor(proposal.totalAmountMinor)} ${proposal.currency}`, source: proposal.evidence[1]?.clause || "AI proposal", confidence },
+    { label: "Payment limit", value: `${formatMinor(proposal.paymentAmountMinor)} / ${proposal.intervalDays} days`, source: proposal.evidence[2]?.clause || "AI proposal", confidence },
+    { label: "Term", value: `${proposal.termMonths} months`, source: `${proposal.startsAt} → ${proposal.expiresAt}`, confidence },
+    { label: "Renewal", value: proposal.renewalRequiresApproval ? "Human approval required" : "Review required", source: "Never auto-authorized", confidence: "Review" },
+  ];
+}
+
+function formatMinor(value: string) {
+  return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 2 }).format(Number(value) / 100);
+}
+
+function compactUsd(value: bigint) {
+  return `$${(Number(value) / 100_000).toFixed(1)}K`;
+}
+
+const syntheticContract = `SYNTHETIC DEMO AGREEMENT. Northstar AI appoints Axiom Compute Labs to provide managed inference services. The initial term begins December 1, 2026 and ends February 28, 2027. Total fees are USD 12,000, payable as USD 4,000 every 30 days for three months. Renewal requires written human approval.`;
+
 function TwinStage({ onNext }: { onNext: () => void }) {
   return <StageShell tag="FluxTwin" title="The commitment is safe—under current assumptions." copy="Forecasts are deterministic. AI explains the result but never invents the numbers." action="Create mandate draft" onNext={onNext}>
-    <div className="metric-grid"><Metric label="Cash" value="$84.2K" delta="unchanged" /><Metric label="Committed" value="$27.4K" delta="+$12K" tone="warn" /><Metric label="Runway" value="12.8 mo" delta="−1.4 mo" tone="warn" /><Metric label="Safe to deploy" value="$18.4K" delta="within policy" tone="good" /></div>
+    <div className="metric-grid"><Metric label="Cash" value={compactUsd(twinScenario.assumptions.cashMinor)} delta="unchanged" /><Metric label="Committed" value={compactUsd(twinScenario.contractuallyCommittedMinor)} delta="+$12K" tone="warn" /><Metric label="Runway" value={`${twinScenario.runwayAfterMonths?.toFixed(1)} mo`} delta={`${((twinScenario.runwayAfterMonths || 0) - (twinScenario.runwayBeforeMonths || 0)).toFixed(1)} mo`} tone="warn" /><Metric label="Safe to deploy" value={compactUsd(twinScenario.safeToDeployMinor)} delta="within reserve policy" tone="good" /></div>
     <div className="timeline"><div className="timeline-labels"><span>NOW</span><span>30D</span><span>60D</span><span>90D</span></div><div className="timeline-track"><i style={{ left: "18%" }} /><i style={{ left: "50%" }} /><i style={{ left: "82%" }} /></div><div className="timeline-obligations"><span style={{ left: "12%" }}>$4K</span><span style={{ left: "44%" }}>$4K</span><span style={{ left: "76%" }}>$4K</span></div></div>
   </StageShell>;
 }
