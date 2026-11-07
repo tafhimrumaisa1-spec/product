@@ -17,6 +17,7 @@ import {
   createRegistryClient,
   deriveCompanyRegistry,
   deriveMandateLink,
+  derivePaymentReceipt,
   type Id32,
 } from "../../registry-client/src/index.js";
 
@@ -25,6 +26,7 @@ const DEFAULT_VENDOR = "CMgP3ZC8JEn7iKJK7yPwtHxjSmtkymjv1XH4dK5PafnE";
 const DECIMALS = 6;
 const UNIT = 10n ** BigInt(DECIMALS);
 const PERIOD_CAP = 4_000n * UNIT;
+const DELEGATED_ALLOWANCE = 10_000n * UNIT;
 const AUTHORIZED_PAYMENT = 1_260n * UNIT;
 const OVER_CAP_PAYMENT = 5_200n * UNIT;
 const CONFIRM = { commitment: "confirmed" as const, preflightCommitment: "confirmed" as const };
@@ -100,7 +102,7 @@ async function main() {
     treasury.address,
     mandateLink,
     payer,
-    PERIOD_CAP,
+    DELEGATED_ALLOWANCE,
     [],
     CONFIRM,
     TOKEN_PROGRAM_ID,
@@ -126,7 +128,8 @@ async function main() {
     cluster: "devnet",
     confirmOptions: { ...CONFIRM, skipPreflight: true },
   });
-  const rejected = await requireCapRejection(() => rejectionClient.executePayment({
+  const overCapReceipt = derivePaymentReceipt(mandateLink, overCapPaymentId);
+  const rejected = await requireCapRejection(connection, overCapReceipt, () => rejectionClient.executePayment({
     companyId,
     mandateId,
     paymentId: overCapPaymentId,
@@ -161,6 +164,7 @@ async function main() {
       authorizedAmountBaseUnits: AUTHORIZED_PAYMENT.toString(),
       vendorBalanceDeltaBaseUnits: (vendorAfter - vendorBefore).toString(),
       periodCapBaseUnits: PERIOD_CAP.toString(),
+      delegatedAllowanceBaseUnits: DELEGATED_ALLOWANCE.toString(),
       overCapAmountBaseUnits: OVER_CAP_PAYMENT.toString(),
       authorizedSettlementVerified: true,
       overCapRejected: true,
@@ -197,21 +201,42 @@ function explorer(signature: string) {
   return `https://explorer.solana.com/tx/${signature}?cluster=devnet`;
 }
 
-async function requireCapRejection(run: () => Promise<unknown>) {
+async function requireCapRejection(connection: Connection, paymentReceipt: PublicKey, run: () => Promise<unknown>) {
+  let clientMessage = "";
+  let clientLogs: string[] = [];
   try {
     await run();
   } catch (error) {
     const record = asRecord(error);
-    const message = error instanceof Error ? error.message : String(error);
-    const logs = Array.isArray(record?.logs) ? record.logs.filter((line): line is string => typeof line === "string") : [];
-    const combined = `${message}\n${logs.join("\n")}`;
-    if (!/CapExceeded|current period cap|exceeds the current period cap/i.test(combined)) {
-      throw new Error(`Over-cap attempt failed for an unexpected reason: ${message}`);
+    clientMessage = error instanceof Error ? error.message : String(error);
+    clientLogs = Array.isArray(record?.logs) ? record.logs.filter((line): line is string => typeof line === "string") : [];
+    if (isCapRejection(`${clientMessage}\n${clientLogs.join("\n")}`)) {
+      const signature = extractSignature(clientMessage);
+      return { rejected: true, reason: "CapExceeded", signature, explorerUrl: signature ? explorer(signature) : null, logs: clientLogs };
     }
-    const signature = extractSignature(message);
-    return { rejected: true, reason: "CapExceeded", signature, explorerUrl: signature ? explorer(signature) : null, logs };
+    for (let attempt = 0; attempt < 12; attempt += 1) {
+      await delay(500 + attempt * 250);
+      const signatures = await connection.getSignaturesForAddress(paymentReceipt, { limit: 5 }, "confirmed");
+      for (const candidate of signatures) {
+        if (!candidate.err) continue;
+        const transaction = await connection.getTransaction(candidate.signature, { commitment: "confirmed", maxSupportedTransactionVersion: 0 });
+        const logs = transaction?.meta?.logMessages || [];
+        if (isCapRejection(logs.join("\n"))) {
+          return { rejected: true, reason: "CapExceeded", signature: candidate.signature, explorerUrl: explorer(candidate.signature), logs };
+        }
+      }
+    }
+    throw new Error(`Over-cap attempt failed for an unexpected reason: ${clientMessage}`);
   }
   throw new Error("SECURITY FAILURE: the over-cap payment was accepted.");
+}
+
+function isCapRejection(value: string) {
+  return /CapExceeded|Error Number: 6017|exceeds the current period cap/i.test(value);
+}
+
+function delay(milliseconds: number) {
+  return new Promise<void>((resolve) => setTimeout(resolve, milliseconds));
 }
 
 function asRecord(value: unknown): Record<string, unknown> | null {

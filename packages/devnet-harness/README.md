@@ -11,7 +11,8 @@ The run performs:
 2. create treasury and vendor token accounts;
 3. initialize a company and commit synthetic contract evidence;
 4. link a 4,000-token, 30-day mandate;
-5. approve the mandate PDA as the treasury token-account delegate;
+5. approve a 10,000-token synthetic SPL allowance to the mandate PDA, leaving
+   the independent program cap at 4,000 tokens;
 6. activate the mandate and execute a 1,260-token payment; and
 7. submit a 5,200-token attempt and require an on-chain cap rejection.
 
