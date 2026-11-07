@@ -130,7 +130,7 @@ pub mod flux_mandate_registry {
 
         token::transfer_checked(
             CpiContext::new_with_signer(
-                ctx.accounts.token_program.to_account_info(),
+                ctx.accounts.token_program.key(),
                 TransferChecked {
                     from: ctx.accounts.source_token.to_account_info(),
                     mint: ctx.accounts.asset_mint.to_account_info(),
