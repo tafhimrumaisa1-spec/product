@@ -35,7 +35,11 @@ The FluxMandate authority registry is deployed and executable on Solana Devnet:
 - Program: `E7MjFsDybvfCaoNWopicKzB4oAtHBWTVAC5ZX9ajWJRq`
 - Explorer: https://explorer.solana.com/address/E7MjFsDybvfCaoNWopicKzB4oAtHBWTVAC5ZX9ajWJRq?cluster=devnet
 
-Registry deployment is verified. Live registry instructions and the payment-enforcement path remain separate integration milestones and are not represented as complete until transaction evidence is recorded.
+The bounded-payment upgrade is deployed. Its source enforces the agent, source
+token account, vendor owner, mint, active window, fixed-period cap, delegated
+allowance and replay-protected payment receipt atomically. End-to-end token
+settlement is not represented as verified until the synthetic Devnet golden
+path has produced transaction evidence.
 
 ## Local development
 

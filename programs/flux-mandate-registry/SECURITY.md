@@ -45,15 +45,15 @@ source token account, vendor owner, asset mint, agent, period cap and time windo
 ## Deployment and migration warning
 
 This version extends `MandateLink` and changes `link_mandate` by adding
-`period_seconds`. It must be rebuilt and upgraded on Devnet before clients use the
-new instruction. Accounts created with the prior layout are incompatible and need
-recreation or a future migration instruction. The hackathon deployment had no
-known mandate accounts when this layout was introduced.
+`period_seconds`. It was upgraded on Devnet in slot `519737941`. Accounts created
+with the prior layout are incompatible and need recreation or a future migration
+instruction. The hackathon deployment had no known mandate accounts when this
+layout was introduced.
 
 ## Verified locally
 
 Pure Rust tests cover accumulation, cap rejection without mutation, fixed-window
-reset, zero amounts, inactive mandates, expiry and lifecycle transition rules. An Anchor build and full
-local-validator integration test remain required in the configured WSL toolchain
-after this change. Do not claim live enforcement until that rebuild, program
-upgrade and a successful Devnet token transfer are independently verified.
+reset, zero amounts, inactive mandates, expiry and lifecycle transition rules.
+The Anchor build and Devnet program upgrade are verified. Do not claim successful
+end-to-end token enforcement until a synthetic Devnet transfer and rejected
+over-cap attempt are independently recorded.
