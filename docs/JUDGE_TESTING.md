@@ -9,7 +9,7 @@ FluxMandate requires no sign-in and uses synthetic agreements and test assets on
 3. Extract the synthetic Axiom Compute agreement.
 4. Inspect clause-linked obligation proposals and approve them as the human reviewer.
 5. Review FluxTwin's deterministic cash, commitment and runway impact.
-6. Inspect the bounded mandate draft. Until the Devnet deployment is complete, this is a labelled demo state.
+6. Inspect the bounded mandate draft. It represents the policy exercised by the recorded Devnet golden path.
 7. Try the in-limit payment and observe the mock policy authorization.
 8. Try the over-limit payment and observe the mock policy rejection.
 9. Open FluxProof to follow contract → obligation → mandate → agent → settlement → ledger.
@@ -29,11 +29,13 @@ FluxMandate requires no sign-in and uses synthetic agreements and test assets on
 - Contract text is not written on-chain.
 - Only approved commitments and bounded authority belong in the registry.
 
-## Pending live checks
+## Recorded Devnet evidence
 
-Do not claim these until a final build records the evidence:
+The Proof screen and `docs/DEVNET_EVIDENCE.md` provide:
 
-- Anchor registry deployed on Devnet with a public program address.
-- A successful Devnet transaction linked from FluxProof.
-- An over-limit attempt rejected by the actual on-chain execution path.
-- Ledger/proof UI driven by integrated package events rather than the guided fixture.
+- The deployed Anchor program and upgrade transaction.
+- An authorized synthetic-token transfer.
+- An over-cap attempt rejected on-chain with `6017 CapExceeded`.
+- A machine-readable evidence record from the reproducible CLI harness.
+
+The connected browser wallet is identity/network UX only; the guided buttons do not submit new transactions.

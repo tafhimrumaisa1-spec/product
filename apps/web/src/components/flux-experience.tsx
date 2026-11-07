@@ -167,7 +167,7 @@ export function FluxExperience() {
             ["FluxContracts", "Interpret", "Evidence-backed obligations from private agreements."],
             ["FluxTwin", "Simulate", "Deterministic impact on cash, burn, and runway."],
             ["FluxMandate", "Authorize", "Human-reviewed limits linked to commercial intent."],
-            ["FluxFlow", "Execute", "Agent payments routed through bounded authority."],
+            ["FluxFlow", "Execute", "Direct and x402 agent requests routed through bounded authority."],
             ["FluxProof", "Explain", "Contract-to-settlement evidence in one trace."],
           ].map(([name, verb, copy], index) => (
             <article className="system-card" key={name}>

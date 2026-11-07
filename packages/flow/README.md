@@ -11,7 +11,7 @@ FluxFlow is the module of FluxMandate that turns an approved, contract-linked ma
 
 | Implemented (tested against mocks) | Implemented (NOT tested against real SDKs/chain) | Roadmap / example only |
 |---|---|---|
-| Config (local, Devnet), validation, remaining-allowance maths, receipt store, confirmation, settlement verifier, payment executor, mock environment | `@solana/subscriptions` adapter, Kit chain reader | x402 V2 sandbox example (not run); MPP sessions / payment channels (interface only) |
+| Config (local, Devnet), validation, remaining-allowance maths, receipt store, confirmation, settlement verifier, payment executor, mock environment, x402 V2 requirement-to-mandate bridge | `@solana/subscriptions` adapter, Kit chain reader | Live x402 facilitator sandbox (not run); MPP sessions / payment channels (interface only) |
 
 ## Layout
 

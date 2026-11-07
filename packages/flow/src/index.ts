@@ -15,6 +15,11 @@ export { InMemoryReceiptStore, type ReceiptStore } from './receipt-store.js';
 export { confirmTransaction } from './confirmation.js';
 export { createSettlementVerifier } from './verifier.js';
 export { createPaymentExecutor, type PaymentExecutorDeps } from './executor.js';
+export {
+  x402V2ToPaymentRequest,
+  type X402MandateContext,
+  type X402V2Requirement,
+} from './x402.js';
 
 // Adapters
 export {

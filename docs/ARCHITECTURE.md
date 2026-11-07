@@ -1,6 +1,6 @@
 # FluxMandate architecture
 
-> Implementation status: the browser demo, live Groq extraction, deterministic simulation, mock execution package, ledger/proof package and replay path exist. The Anchor registry is deployed and executable on Devnet at `E7MjFsDybvfCaoNWopicKzB4oAtHBWTVAC5ZX9ajWJRq`. Registry instructions and the payment path still require end-to-end transaction verification. Any claim about payment enforcement describes the target live path until that evidence exists.
+> Implementation status: the browser demo, live Groq extraction, deterministic simulation, execution package, ledger/proof package and replay path exist. The Anchor registry and bounded-payment program are deployed on Devnet at `E7MjFsDybvfCaoNWopicKzB4oAtHBWTVAC5ZX9ajWJRq`. A synthetic golden path proves an authorized token transfer and an on-chain `6017 CapExceeded` rejection. Browser-created mandates and live x402 facilitator settlement remain future integration work.
 
 ## Product boundary
 
@@ -55,11 +55,12 @@ Agent spend intent ─────────────► FluxFlow policy/ex
 | Contract extraction | Server-only Groq route, strict validation, deterministic fallback | Implemented |
 | Human checkpoint | Explicit guided-demo approval step | Implemented for demo |
 | Cash/runway simulation | Pure deterministic FluxTwin calculations | Implemented |
-| Registry | Anchor company, commitment and mandate accounts; bounded lifecycle | Deployed executable on Devnet; instruction evidence pending |
-| Payment execution | Mock-first FluxFlow with passing unit/security tests | Implemented against mocks; real adapters unverified |
+| Registry | Anchor company, commitment and mandate accounts; bounded lifecycle | Deployed and exercised on Devnet |
+| Payment execution | FluxFlow policy engine plus Anchor bounded-payment instruction | Authorized transfer and over-cap rejection verified on Devnet |
 | Ledger and proof | Typed event and trace package | Integrated locally; host wiring pending |
 | Phantom | Browser connection control | Implemented; signing flow pending |
-| Devnet settlement | Real signature and Explorer evidence | Not yet verified |
+| Devnet settlement | Real signatures, receipt PDA and Explorer evidence | Verified with synthetic Devnet assets |
+| x402 V2 | Tested challenge-to-mandate policy bridge; isolated V2 sandbox | Live facilitator settlement pending |
 
 ## Privacy boundary
 

@@ -32,13 +32,13 @@ Show cash, committed spend, runway and safe-to-deploy capacity.
 
 Show the vendor, asset, cap, agent and expiry.
 
-> The approved terms become a revocable authority envelope. The local Anchor program records contract commitments and mandate state. If Devnet deployment is not yet complete, describe this screen as the guided fixture—not a live transaction.
+> The approved terms become a revocable authority envelope. The deployed Anchor program records contract commitments and mandate state and enforces the payment cap. This screen is a guided representation of the recorded Devnet run—not a new wallet transaction.
 
 ## 2:10–2:35 — Both sides of the boundary
 
 Try USD 1,260, then USD 5,200.
 
-> The first request is within the USD 4,000 cap. The second exceeds it and is refused with a reason. In the current guided build this exercises the deterministic mock path; only call it on-chain after a real Devnet signature and rejection have been verified.
+> The first request is within the USD 4,000 cap. The second exceeds it and is refused with a reason. The interactive buttons exercise the deterministic replay path; the Proof step links the separate recorded Devnet transfer and on-chain rejection.
 
 ## 2:35–3:00 — Proof and close
 

@@ -29,6 +29,7 @@ FluxMandate converts commercial agreements into reviewed obligations, determinis
 - Phantom browser connection on Solana Devnet
 - Recorded Devnet settlement plus an on-chain `6017 CapExceeded` rejection
 - Deterministic in-browser replay of the same decision boundary
+- Tested x402 V2 challenge-to-mandate bridge (live facilitator settlement is not part of the demo)
 
 Replay mode is intentionally labelled and remains available when an AI provider or Devnet is unavailable.
 

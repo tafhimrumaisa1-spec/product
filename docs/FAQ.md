@@ -10,7 +10,11 @@ No. Full contract text and clause evidence remain off-chain. The registry is des
 
 ## Does the current build settle on Devnet?
 
-Not yet as a verified end-to-end claim. The Anchor registry compiles locally and FluxFlow passes mock tests, but the real adapter and Devnet deployment still require verification.
+Yes, with synthetic Devnet assets through the reproducible CLI harness. The recorded golden path includes an authorized transfer and an on-chain `6017 CapExceeded` rejection. The public browser demo replays that boundary deterministically; it does not ask judges to spend funds.
+
+## Is x402 live?
+
+The x402 V2 challenge-to-mandate bridge is implemented and tested: network, asset, amount and recipient are converted into the same FluxFlow request that undergoes mandate enforcement. Live facilitator settlement is an isolated sandbox/roadmap integration, not part of the judged golden path.
 
 ## What happens when Groq is unavailable?
 

@@ -21,7 +21,7 @@ No. The AI has no signing keys and no endpoint that creates mandates or sends pa
 A human with approval rights in the application. In the demo this is the presenter.
 
 **What if the agent is compromised?**
-It can only attempt payments within the mandate's limits. The company can revoke the mandate **[Verify implemented in the build]**; maximum exposure is bounded by the cap and period.
+It can only attempt payments within the mandate's limits. The authority can pause or revoke the mandate through the on-chain lifecycle; maximum exposure is bounded by the cap and period.
 
 ## AI errors
 **What if the AI extracts the wrong amount or date?**
@@ -54,4 +54,4 @@ To avoid real financial risk and regulatory exposure while the design is evaluat
 The demo uses synthetic contracts. Real-contract use is not recommended until evaluation and security work are done.
 
 **Does a rejected payment cost fees?**
-A request the mandate check refuses before submission moves no funds and costs nothing. Where a transaction is submitted and then fails on-chain, normal Devnet network fees apply (test assets, no value). Which path the build uses should be confirmed **[Verify behaviour in the build]**.
+The guided replay rejects before submission, moves no funds and costs nothing. In the recorded Devnet proof, the over-cap transaction reaches the program and fails on-chain, so the submitting Devnet wallet pays the test-network fee while no token value moves.

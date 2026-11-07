@@ -7,3 +7,5 @@ Companies are starting to let AI agents buy compute, data and services, but cont
 AI interprets, humans approve, code calculates, Solana enforces. The AI never holds signing keys and cannot approve mandates. Contract documents stay private; only salted commitments, authority state and settlement evidence go on-chain.
 
 The demo uses synthetic contracts and Devnet assets only, with no real money. Judges can test without a wallet, with Phantom on Devnet, or through verified replay.
+
+FluxFlow also includes a tested x402 V2 bridge: an agent-facing payment challenge becomes a canonical spend request, then passes through the same contract-linked recipient, asset, cap, expiry, allowance and replay controls. Live facilitator settlement is intentionally outside the hackathon golden path.
