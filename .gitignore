@@ -8,5 +8,6 @@ test-ledger/
 .env.local
 *.keypair.json
 *.log
+*.tsbuildinfo
 .DS_Store
 
