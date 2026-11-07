@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { ExtractionResult } from "@/lib/flux-contracts";
 import { WalletConnect } from "./wallet-connect";
 import { simulateTwin } from "../../../../packages/twin/src/index";
@@ -24,6 +24,23 @@ const trace = [
   ["Ledger", "Infrastructure · posted"],
 ];
 
+interface DemoPaymentEvidence {
+  outcome: "settled" | "rejected";
+  sentTransactions: number;
+  onchain: false;
+  notice: string;
+  rejection?: { code: string; message: string };
+}
+
+interface DemoProofEvidence {
+  notice: string;
+  trace: {
+    complete: boolean;
+    headline: string;
+    steps: Array<{ kind: string; status: string; entries: Array<{ summary: string }> }>;
+  };
+}
+
 const twinScenario = simulateTwin({
   cashMinor: 8_420_000n,
   monthlyRevenueMinor: 5_000_000n,
@@ -42,6 +59,8 @@ export function FluxExperience() {
   const [extraction, setExtraction] = useState<ExtractionResult | null>(null);
   const [extracting, setExtracting] = useState(false);
   const [demoMode, setDemoMode] = useState<"live" | "replay">("live");
+  const [paymentEvidence, setPaymentEvidence] = useState<DemoPaymentEvidence | null>(null);
+  const [paymentPending, setPaymentPending] = useState(false);
 
   const progress = useMemo(() => `${Math.round(((step + 1) / steps.length) * 100)}%`, [step]);
 
@@ -69,6 +88,26 @@ export function FluxExperience() {
       setStep(1);
     } finally {
       setExtracting(false);
+    }
+  }
+
+  async function runPayment(scenario: "authorized" | "over_cap") {
+    setPaymentPending(true);
+    try {
+      const response = await fetch("/api/demo/payment", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ scenario }),
+      });
+      if (!response.ok) throw new Error("Payment simulation request failed");
+      const evidence = await response.json() as DemoPaymentEvidence;
+      setPaymentEvidence(evidence);
+      setPaymentState(evidence.outcome === "settled" ? "settled" : "blocked");
+    } catch {
+      setPaymentEvidence({ outcome: "rejected", sentTransactions: 0, onchain: false, notice: "The deterministic demo service is unavailable.", rejection: { code: "DEMO_UNAVAILABLE", message: "Retry the request." } });
+      setPaymentState("blocked");
+    } finally {
+      setPaymentPending(false);
     }
   }
 
@@ -110,9 +149,9 @@ export function FluxExperience() {
             <div className="core"><small>SAFE TO DEPLOY</small><strong>$18.4K</strong><span>verified capacity</span></div>
             <article className="floating-card card-contract"><small>CONTRACT</small><strong>Axiom Compute</strong><span>$12K · 3 months</span></article>
             <article className="floating-card card-agent"><small>AGENT 01</small><strong>$2.74K left</strong><span>mandate active</span></article>
-            <article className="floating-card card-proof"><small>PROOF</small><strong>6 linked records</strong><span>settled on Devnet</span></article>
+            <article className="floating-card card-proof"><small>REGISTRY</small><strong>Live on Devnet</strong><span>program executable</span></article>
           </div>
-          <div className="instrument-foot"><span><i className="signal" /> Authority healthy</span><span className="mono">slot 418,920,114</span></div>
+          <div className="instrument-foot"><span><i className="signal" /> Registry verified</span><a className="mono" href="https://explorer.solana.com/address/E7MjFsDybvfCaoNWopicKzB4oAtHBWTVAC5ZX9ajWJRq?cluster=devnet" target="_blank" rel="noreferrer">E7Mj…WJRq ↗</a></div>
         </div>
       </section>
 
@@ -148,7 +187,7 @@ export function FluxExperience() {
                 </button>
               ))}
             </nav>
-            <div className="sidebar-proof"><small>SYSTEM STATUS</small><span><i className="signal" /> Local proof ready</span><span><i className="signal" /> No real funds</span></div>
+            <div className="sidebar-proof"><small>SYSTEM STATUS</small><span><i className="signal" /> Devnet registry live</span><span><i className="signal" /> No real funds</span></div>
           </aside>
 
           <div className="demo-workspace">
@@ -165,7 +204,7 @@ export function FluxExperience() {
               {step === 1 && <ReviewStage approved={approved} extraction={extraction} onNext={advance} />}
               {step === 2 && <TwinStage onNext={advance} />}
               {step === 3 && <MandateStage onNext={advance} />}
-              {step === 4 && <AgentStage state={paymentState} setState={setPaymentState} onNext={advance} />}
+              {step === 4 && <AgentStage state={paymentState} evidence={paymentEvidence} pending={paymentPending} onPayment={runPayment} onNext={advance} />}
               {step === 5 && <ProofStage state={paymentState} />}
             </div>
           </div>
@@ -254,18 +293,40 @@ function MandateStage({ onNext }: { onNext: () => void }) {
   </StageShell>;
 }
 
-function AgentStage({ state, setState, onNext }: { state: "idle" | "settled" | "blocked"; setState: (state: "settled" | "blocked") => void; onNext: () => void }) {
+function AgentStage({ state, evidence, pending, onPayment, onNext }: { state: "idle" | "settled" | "blocked"; evidence: DemoPaymentEvidence | null; pending: boolean; onPayment: (scenario: "authorized" | "over_cap") => Promise<void>; onNext: () => void }) {
   return <StageShell tag="FluxFlow" title="The agent can act without unlimited access." copy="Test both sides of the boundary. The final build will submit these attempts against localnet and Devnet." action="Inspect full proof" onNext={onNext}>
     <div className="agent-panel"><div className="agent-identity"><span className="agent-avatar">A1</span><div><small>AUTONOMOUS BUYER</small><strong>Compute Buyer 01</strong><span>Mandate FM-8842</span></div></div><div className="allowance"><small>PERIOD ALLOWANCE</small><strong>$4,000</strong><div><i style={{ width: state === "settled" ? "31.5%" : "0%" }} /></div><span>{state === "settled" ? "$1,260 consumed · $2,740 available" : "$4,000 available"}</span></div></div>
-    <div className="payment-actions"><button onClick={() => setState("settled")}><span>01</span><b>Pay $1,260</b><small>Within mandate</small></button><button onClick={() => setState("blocked")}><span>02</span><b>Pay $5,200</b><small>Exceeds cap</small></button></div>
-    {state !== "idle" && <div className={`decision ${state}`}><b>{state === "settled" ? "Payment authorized" : "Payment blocked"}</b><span>{state === "settled" ? "Recipient, asset, period, and remaining allowance match." : "Requested amount exceeds the 4,000 DemoUSD period cap."}</span></div>}
+    <div className="payment-actions"><button disabled={pending} onClick={() => void onPayment("authorized")}><span>01</span><b>Pay $1,260</b><small>Within mandate</small></button><button disabled={pending} onClick={() => void onPayment("over_cap")}><span>02</span><b>Pay $5,200</b><small>Exceeds cap</small></button></div>
+    {pending && <div className="decision"><b>Evaluating authority…</b><span>FluxFlow is checking the deterministic mandate boundary.</span></div>}
+    {!pending && state !== "idle" && <div className={`decision ${state}`}><b>{state === "settled" ? "Payment authorized" : "Payment blocked"}</b><span>{state === "settled" ? "Recipient, asset, period, and remaining allowance match." : evidence?.rejection?.message || "Requested amount exceeds the period cap."}</span></div>}
+    {evidence && <div className="evidence-note"><b>Deterministic mock</b><span>{evidence.notice}</span><small>{evidence.sentTransactions} synthetic transaction{evidence.sentTransactions === 1 ? "" : "s"} submitted</small></div>}
   </StageShell>;
 }
 
 function ProofStage({ state }: { state: "idle" | "settled" | "blocked" }) {
-  return <div className="stage"><div className="stage-intro"><span className="stage-tag">FluxProof</span><h3>One trace. Every reason.</h3><p>The production trace will link directly to the Solana Explorer. This foundation uses clearly labelled synthetic evidence until the program is deployed.</p></div>
-    <div className="trace">{trace.map(([label, value], index) => <article key={label}><span>{String(index + 1).padStart(2, "0")}</span><div><small>{label}</small><strong>{value}</strong></div>{index < trace.length - 1 && <i />}</article>)}</div>
-    <div className="proof-receipt"><div><small>DEMO OUTCOME</small><strong>{state === "blocked" ? "Rejected before settlement" : "Settlement evidence prepared"}</strong></div><span className={`status ${state === "blocked" ? "status-danger" : "status-good"}`}>{state === "blocked" ? "Policy blocked" : "Verified path"}</span></div>
+  const [proof, setProof] = useState<DemoProofEvidence | null>(null);
+  const [proofError, setProofError] = useState(false);
+
+  useEffect(() => {
+    const scenario = state === "blocked" ? "over_limit" : "success";
+    setProofError(false);
+    fetch(`/api/demo/proof?scenario=${scenario}`)
+      .then((response) => {
+        if (!response.ok) throw new Error("Proof request failed");
+        return response.json() as Promise<DemoProofEvidence>;
+      })
+      .then(setProof)
+      .catch(() => setProofError(true));
+  }, [state]);
+
+  const visibleTrace = proof?.trace.steps.map((step) => [humanize(step.kind), step.entries[0]?.summary || step.status]) || trace;
+  return <div className="stage"><div className="stage-intro"><span className="stage-tag">FluxProof</span><h3>One trace. Every reason.</h3><p>This public trace comes from the deterministic ledger package. Synthetic fixture signatures intentionally have no Explorer links.</p></div>
+    <div className="trace">{visibleTrace.map(([label, value], index) => <article key={`${label}-${index}`}><span>{String(index + 1).padStart(2, "0")}</span><div><small>{label}</small><strong>{value}</strong></div>{index < visibleTrace.length - 1 && <i />}</article>)}</div>
+    <div className="proof-receipt"><div><small>DEMO OUTCOME</small><strong>{proofError ? "Proof service unavailable" : proof?.trace.headline || (state === "blocked" ? "Rejected before settlement" : "Building evidence trace…")}</strong><span>{proof?.notice}</span></div><span className={`status ${state === "blocked" || proofError ? "status-danger" : "status-good"}`}>{proof?.trace.complete ? "Trace complete" : state === "blocked" ? "Policy blocked" : "Replay evidence"}</span></div>
   </div>;
+}
+
+function humanize(value: string) {
+  return value.replaceAll("_", " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
 

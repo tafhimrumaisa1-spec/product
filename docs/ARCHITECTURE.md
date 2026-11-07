@@ -1,6 +1,6 @@
 # FluxMandate architecture
 
-> Implementation status: the browser demo, live Groq extraction, deterministic simulation, Anchor registry source, mock execution package, ledger/proof package and replay path exist locally. The registry and payment path have **not** yet been verified on Devnet. Any statement about on-chain enforcement below describes the target live path until that verification is complete.
+> Implementation status: the browser demo, live Groq extraction, deterministic simulation, mock execution package, ledger/proof package and replay path exist. The Anchor registry is deployed and executable on Devnet at `E7MjFsDybvfCaoNWopicKzB4oAtHBWTVAC5ZX9ajWJRq`. Registry instructions and the payment path still require end-to-end transaction verification. Any claim about payment enforcement describes the target live path until that evidence exists.
 
 ## Product boundary
 
@@ -55,7 +55,7 @@ Agent spend intent ─────────────► FluxFlow policy/ex
 | Contract extraction | Server-only Groq route, strict validation, deterministic fallback | Implemented |
 | Human checkpoint | Explicit guided-demo approval step | Implemented for demo |
 | Cash/runway simulation | Pure deterministic FluxTwin calculations | Implemented |
-| Registry | Anchor company, commitment and mandate accounts; bounded lifecycle | Built locally; Devnet pending |
+| Registry | Anchor company, commitment and mandate accounts; bounded lifecycle | Deployed executable on Devnet; instruction evidence pending |
 | Payment execution | Mock-first FluxFlow with passing unit/security tests | Implemented against mocks; real adapters unverified |
 | Ledger and proof | Typed event and trace package | Integrated locally; host wiring pending |
 | Phantom | Browser connection control | Implemented; signing flow pending |

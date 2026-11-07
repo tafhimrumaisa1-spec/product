@@ -28,6 +28,15 @@ FluxMandate converts commercial agreements into reviewed obligations, determinis
 
 Replay mode is intentionally labelled and remains available when an AI provider or Devnet is unavailable.
 
+## Devnet deployment
+
+The FluxMandate authority registry is deployed and executable on Solana Devnet:
+
+- Program: `E7MjFsDybvfCaoNWopicKzB4oAtHBWTVAC5ZX9ajWJRq`
+- Explorer: https://explorer.solana.com/address/E7MjFsDybvfCaoNWopicKzB4oAtHBWTVAC5ZX9ajWJRq?cluster=devnet
+
+Registry deployment is verified. Live registry instructions and the payment-enforcement path remain separate integration milestones and are not represented as complete until transaction evidence is recorded.
+
 ## Local development
 
 Run from Ubuntu/WSL:

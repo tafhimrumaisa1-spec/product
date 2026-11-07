@@ -1,0 +1,11 @@
+{
+  "name": "@fluxmandate/registry-client",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": { ".": "./src/index.ts" },
+  "types": "./src/index.ts",
+  "scripts": { "typecheck": "tsc --noEmit", "test": "tsx --test tests/*.test.ts" },
+  "dependencies": { "@anchor-lang/core": "1.2.2", "@solana/web3.js": "1.99.0" },
+  "devDependencies": { "@types/node": "latest", "tsx": "^4.20.0", "typescript": "latest" }
+}
