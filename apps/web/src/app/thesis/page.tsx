@@ -135,6 +135,11 @@ export default function ThesisPage() {
 
       <section className={`${styles.section} ${styles.proofSection}`}>
         <SectionIntro index="08" label="REAL PROOF, NOT A CONCEPT" title={<>We tested both sides<br />of authority.</>} copy="The public demo is safely replayable. The underlying enforcement evidence is independently inspectable on Solana Devnet." />
+        <div className={styles.solanaStatement}>
+          <small>SOLANA IS NOT DATABASE DECORATION</small>
+          <p>Our deployed Anchor program independently enforces the mandate. On Devnet, an authorized <b>1,260-unit</b> payment settled, while a <b>5,200-unit</b> attempt against a <b>4,000-unit period cap</b> failed on-chain with <code>6017 CapExceeded</code>.</p>
+          <span>THE LIMIT CHECK AND TOKEN TRANSFER SHARE ONE ATOMIC BOUNDARY.</span>
+        </div>
         <div className={styles.evidenceGrid}>
           <a href={devnetTransaction(DEVNET_EVIDENCE.authorized.signature)} target="_blank" rel="noreferrer"><small>AUTHORIZED</small><strong>1,260</strong><span>DemoUSD finalized ↗</span></a>
           <a href={devnetTransaction(DEVNET_EVIDENCE.rejected.signature)} target="_blank" rel="noreferrer"><small>REJECTED</small><strong>5,200</strong><span>6017 CapExceeded ↗</span></a>
