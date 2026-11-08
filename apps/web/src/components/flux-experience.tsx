@@ -296,8 +296,23 @@ function MandateStage({ onNext }: { onNext: () => void }) {
 }
 
 function AgentStage({ state, evidence, pending, onPayment, onNext }: { state: "idle" | "settled" | "blocked"; evidence: DemoPaymentEvidence | null; pending: boolean; onPayment: (scenario: "authorized" | "over_cap") => Promise<void>; onNext: () => void }) {
-  return <StageShell tag="FluxFlow" title="The agent can act without unlimited access." copy="Test both sides of the boundary. The final build will submit these attempts against localnet and Devnet." action="Inspect full proof" onNext={onNext}>
-    <div className="agent-panel"><div className="agent-identity"><span className="agent-avatar">A1</span><div><small>AUTONOMOUS BUYER</small><strong>Compute Buyer 01</strong><span>Mandate FM-8842</span></div></div><div className="allowance"><small>PERIOD ALLOWANCE</small><strong>$4,000</strong><div><i style={{ width: state === "settled" ? "31.5%" : "0%" }} /></div><span>{state === "settled" ? "$1,260 consumed · $2,740 available" : "$4,000 available"}</span></div></div>
+  const executionStatus = pending ? "checking authority" : state === "settled" ? "settlement verified" : state === "blocked" ? "request contained" : "request ready";
+  return <StageShell tag="FluxFlow" title="A multi-agent finance team. One bounded authority." copy="Seven specialized agents work in parallel over the same Company Twin. They communicate through FluxGraph; none can exceed the human-approved mandate." action="Inspect full proof" onNext={onNext}>
+    <div className="agent-network" aria-label="Multi-agent finance system coordinated through the Northstar AI company twin">
+      <div className="network-caption"><span>MULTI-AGENT FINANCE SYSTEM</span><b><i /> 7 agents synchronized</b></div>
+      <svg className="network-lines" viewBox="0 0 1000 300" preserveAspectRatio="none" aria-hidden="true">
+        <path className="network-ring" d="M115 65 L360 48 L640 48 L885 65 L760 245 L500 260 L240 245 Z" />
+        <path d="M500 150 L115 65 M500 150 L360 48 M500 150 L640 48 M500 150 L885 65 M500 150 L760 245 M500 150 L500 260 M500 150 L240 245" />
+      </svg>
+      <div className="finance-agent agent-contract"><span>01</span><div><small>CONTRACT AGENT</small><strong>Terms verified</strong></div><i /></div>
+      <div className="finance-agent agent-treasury"><span>02</span><div><small>TREASURY AGENT</small><strong>Runway watching</strong></div><i /></div>
+      <div className="finance-agent agent-risk"><span>03</span><div><small>RISK SENTINEL</small><strong>Cap enforced</strong></div><i /></div>
+      <div className="finance-agent agent-purchase"><span>04</span><div><small>PURCHASING AGENT</small><strong>{executionStatus}</strong></div><i /></div>
+      <div className="finance-agent agent-settlement"><span>05</span><div><small>SETTLEMENT AGENT</small><strong>{state === "settled" ? "Chain confirmed" : state === "blocked" ? "No value moved" : "Chain listening"}</strong></div><i /></div>
+      <div className="finance-agent agent-ledger"><span>06</span><div><small>LEDGER AGENT</small><strong>{state === "settled" ? "Entry reconciled" : "Reconcile ready"}</strong></div><i /></div>
+      <div className="finance-agent agent-scenario"><span>07</span><div><small>SCENARIO AGENT</small><strong>9.6 mo runway</strong></div><i /></div>
+      <div className="company-twin-core"><small>NORTHSTAR AI</small><strong>COMPANY TWIN</strong><span>Mandate kernel · FM-8842</span><div><b>{state === "settled" ? "$2,740" : "$4,000"}</b><em>available</em></div></div>
+    </div>
     <div className="payment-actions"><button disabled={pending} onClick={() => void onPayment("authorized")}><span>01</span><b>Pay $1,260</b><small>Within mandate</small></button><button disabled={pending} onClick={() => void onPayment("over_cap")}><span>02</span><b>Pay $5,200</b><small>Exceeds cap</small></button></div>
     {pending && <div className="decision"><b>Evaluating authority…</b><span>FluxFlow is checking the deterministic mandate boundary.</span></div>}
     {!pending && state !== "idle" && <div className={`decision ${state}`}><b>{state === "settled" ? "Payment authorized" : "Payment blocked"}</b><span>{state === "settled" ? "Recipient, asset, period, and remaining allowance match." : evidence?.rejection?.message || "Requested amount exceeds the period cap."}</span></div>}
