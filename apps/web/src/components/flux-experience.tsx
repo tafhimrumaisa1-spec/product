@@ -121,6 +121,7 @@ export function FluxExperience() {
           <span>FluxMandate</span>
         </a>
         <div className="nav-links">
+          <a href="/thesis">The Thesis</a>
           <a href="#system">System</a>
           <a href="#proof">Proof</a>
           <span className="network-pill"><i /> Devnet ready</span>
