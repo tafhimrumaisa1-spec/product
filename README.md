@@ -1,67 +1,106 @@
 # FluxMandate
 
-**The living financial authority system for autonomous companies.**
+**The contract-to-authority layer for autonomous companies.**
 
-FluxMandate converts commercial agreements into reviewed obligations, deterministic company simulations, and bounded financial authority that can be verified on Solana.
+[Live product](https://fluxmandate.vercel.app) · [The Thesis](https://fluxmandate.vercel.app/thesis) · [Solana program](https://explorer.solana.com/address/E7MjFsDybvfCaoNWopicKzB4oAtHBWTVAC5ZX9ajWJRq?cluster=devnet) · [Judge testing guide](docs/submission/JUDGE_TESTING.md)
 
-## Golden path
+FluxMandate converts private commercial agreements into evidence-backed obligations, deterministic company simulations and human-approved spending authority that is independently enforced on Solana.
+
+> AI interprets. Humans approve. Deterministic systems calculate. Solana enforces.
+
+## Why it exists
+
+AI agents can already purchase compute, data and software. A wallet can prove who signed, and a payment protocol can move value, but neither proves that a payment was permitted by a contract, safe for the company's runway or explainable to finance later.
+
+FluxMandate fills that missing layer:
 
 `Contract → AI proposal → Human approval → FluxTwin → FluxMandate → Agent payment → FluxLedger → FluxProof`
 
-## Workspace
+## Verified hackathon build
 
-- `apps/web` — public explanation and no-login guided demo
-- `packages/contracts` — evidence-bound extraction and human-only obligation review
-- `packages/graph` — strict economic graph, lifecycle machines and audit-chain validation
-- `packages/domain` — shared FluxGraph types and lifecycle rules
-- `packages/twin` — compatibility calculator plus full multi-scenario FluxTwin engine
-- `packages/devnet-harness` — reproducible synthetic Devnet enforcement proof
-- `programs/flux-mandate-registry` — Anchor semantic registry
-- `docs` — architecture, evidence and reconciled submission materials
+| Capability | Evidence |
+| --- | --- |
+| Contract intelligence | Live server-side Groq extraction, strict schema validation and clause-linked proposals |
+| Human control | Material obligations require explicit approval before becoming authority |
+| Company Twin | Deterministic cash, commitment, runway and safe-to-deploy simulation |
+| Multi-agent finance | Seven specialized agents share FluxGraph state and one bounded Mandate Kernel |
+| Solana enforcement | Deployed Anchor program checks agent, recipient, asset, time window, cap and allowance |
+| Authorized settlement | [1,260 synthetic units finalized on Devnet](https://explorer.solana.com/tx/eDFgXQ17fLKvgt8J33k5po3nVTXqYXGE1o6ajQmjF1RkZmZLhpRyiYS8e4aSDxYWTpyC15DPbhYUApMM8xoV9xQ?cluster=devnet) |
+| Enforced rejection | [5,200-unit attempt rejected against a 4,000-unit cap](https://explorer.solana.com/tx/3sognxbcxsbcZbUhnwNKmcAoWeB2YQB97LP5yuRrRdHLoMkQL1LR6Fqo9drFPUrnkFgKGkqBpTRBZfuRPW17TwSR?cluster=devnet) with `6017 CapExceeded` |
+| x402 V2 | Tested challenge-to-mandate bridge; live facilitator settlement remains the next adapter |
+| Engineering | 416 passing tests, strict TypeScript and a production Next.js build |
 
-## Implemented demo
+The browser experience uses synthetic data and deterministic replay so judges can test safely without spending funds. The Proof stage links the separate recorded Devnet transactions.
 
-- Live Groq contract extraction with strict server-side validation
-- Human approval checkpoint before authority creation
-- Deterministic FluxTwin runway and safe-to-deploy calculations
-- Local Anchor registry for contract commitments and mandate state
-- Explicit Live AI and Verified Replay modes
-- Phantom browser connection on Solana Devnet
-- Recorded Devnet settlement plus an on-chain `6017 CapExceeded` rejection
-- Deterministic in-browser replay of the same decision boundary
-- Tested x402 V2 challenge-to-mandate bridge (live facilitator settlement is not part of the demo)
+## Why Solana is essential
 
-Replay mode is intentionally labelled and remains available when an AI provider or Devnet is unavailable.
+Solana is not used as database decoration. The deployed program makes the authority check and token transfer one atomic boundary: an agent cannot bypass the approved vendor, asset, validity window, period cap, delegated allowance or replay protection.
 
-## Devnet deployment
+- Program ID: `E7MjFsDybvfCaoNWopicKzB4oAtHBWTVAC5ZX9ajWJRq`
+- Network: Solana Devnet
+- Upgrade transaction: [3PtEK…2aHc6](https://explorer.solana.com/tx/3PtEKndi9srUYSDqCmakLSU8md4PyvfQeXDgLmg3dBTkjM3DPhYUEE8LjYVCkPFEVdqy7yDJyspF1WQN2Lx2aHc6?cluster=devnet)
+- Machine-readable run: [`packages/devnet-harness/evidence`](packages/devnet-harness/evidence)
+- Full evidence notes: [`docs/DEVNET_EVIDENCE.md`](docs/DEVNET_EVIDENCE.md)
 
-The FluxMandate authority registry is deployed and executable on Solana Devnet:
+## Architecture
 
-- Program: `E7MjFsDybvfCaoNWopicKzB4oAtHBWTVAC5ZX9ajWJRq`
-- Explorer: https://explorer.solana.com/address/E7MjFsDybvfCaoNWopicKzB4oAtHBWTVAC5ZX9ajWJRq?cluster=devnet
+| Module | Responsibility |
+| --- | --- |
+| `FluxContracts` | Evidence-bound extraction and human-only obligation review |
+| `FluxGraph` | Shared economic entities, lifecycle transitions and tamper-evident events |
+| `FluxTwin` | Multi-scenario cash, runway, renewal and risk simulation |
+| `FluxMandate` | Contract-linked authority registry and bounded payment program |
+| `FluxFlow` | Direct and x402 spend requests, validation and settlement verification |
+| `FluxLedger` | Reconciliation and machine-service accounting |
+| `FluxProof` | Contract-to-settlement explanation and public evidence |
 
-The bounded-payment upgrade is deployed. Its source enforces the agent, source
-token account, vendor owner, mint, active window, fixed-period cap, delegated
-allowance and replay-protected payment receipt atomically. End-to-end token
-settlement is verified by the synthetic Devnet golden path. Public transaction
-evidence is checked in under `packages/devnet-harness/evidence/` and linked from
-the proof screen.
+Private contract text and clause evidence remain off-chain. Only commitments, authority state and settlement evidence belong on the public ledger.
 
-## Local development
+## Repository map
 
-Run from Ubuntu/WSL:
+- `apps/web` — public product, Thesis page and guided demo
+- `packages/contracts` — extraction, review and salted commitments
+- `packages/graph` — validated economic graph and lifecycle machines
+- `packages/twin` — deterministic multi-scenario Company Twin
+- `packages/flow` — payment execution, x402 bridge and safety controls
+- `packages/ledger-proof` — reconciliation and proof generation
+- `packages/devnet-harness` — reproducible Devnet golden path
+- `programs/flux-mandate-registry` — deployed Anchor program
+- `docs/submission` — demo script, judge guide, FAQ, roadmap and submission copy
+
+## Run locally
+
+Requirements: Node.js 24+, npm and—only for Anchor development—Rust, Solana/Agave 4.1.2 and Anchor 1.2.2.
 
 ```bash
-cd /mnt/g/FLUXMANDATE/product
-npm --prefix apps/web install
+git clone https://github.com/tafhimrumaisa1-spec/product.git
+cd product
+npm ci
+cp apps/web/.env.example apps/web/.env.local
 npm run dev
 ```
 
-Open `http://localhost:3000`.
+Open `http://localhost:3000`. Replay mode works without an AI key. For Live AI, set a server-only `GROQ_API_KEY` in `apps/web/.env.local`; never use a `NEXT_PUBLIC_` prefix for secrets.
 
-Copy `apps/web/.env.example` to `apps/web/.env.local` and provide a server-only `GROQ_API_KEY` to use live extraction. Never prefix AI secrets with `NEXT_PUBLIC_`.
+## Verify
 
-## Safety
+```bash
+npm run verify
+npm run build
+```
 
-This hackathon build uses synthetic contracts and Devnet/local assets only. AI proposes; humans approve; deterministic code calculates; Solana enforces.
+To reproduce the synthetic Devnet golden path with a funded disposable Devnet signer:
 
+```bash
+npm run devnet:golden-path
+```
+
+Never use a personal or mainnet wallet. This hackathon build uses synthetic agreements and Devnet/local assets only.
+
+## Track
+
+FluxMandate is a **DefAI** project: AI interprets financial meaning while deterministic policy and Solana enforce the resulting authority. It is not an AI trading bot, custodial wallet or replacement for legal and accounting review.
+
+## License
+
+Licensed under the [Apache License 2.0](LICENSE).
